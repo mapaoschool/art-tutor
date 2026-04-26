@@ -513,7 +513,7 @@ IMPORTANT: Never give away answers. Guide through questions. Be encouraging. Sta
 Respond in plain text — no markdown headers, no bullet symbols. Natural tutor voice.`;
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages',{
+    const res = await fetch('https://divine-sunset-f2ee.panicovillegas.workers.dev',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
@@ -639,7 +639,7 @@ async function giveHint(){
   const lessonText = document.getElementById('ai-response').textContent.substring(0,400);
   const gradeCtx = {AL:'Grade 9–12 — mature, precise',FA:'Grade 1–4 — simple, warm',FC:'Grade 1–4 — simple, warm',LJ:'Kindergarten with Grade 3 logic — playful, short sentences'};
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages',{
+    const res = await fetch('https://divine-sunset-f2ee.panicovillegas.workers.dev',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
@@ -669,7 +669,7 @@ async function nextQuestion(){
   const sess = getSession(curStudent, curSubject.id);
   const studentNames = {AL:'A.L. (Grade 9–12)',FA:'F.A. (Grade 1–4)',FC:'F.C. (Grade 1–4)',LJ:'L.J. (Kindergarten, logic Grade 3)'};
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages',{
+    const res = await fetch('https://divine-sunset-f2ee.panicovillegas.workers.dev',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
