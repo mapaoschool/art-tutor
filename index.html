@@ -114,6 +114,19 @@ body{font-family:'Georgia',serif;background:var(--parch);color:var(--ink);min-he
 .tracker{background:var(--green-light);border:1px solid #A0D090;border-radius:var(--radius-sm);padding:8px 13px;margin-bottom:13px;font-size:12px;color:var(--green);font-family:sans-serif;display:flex;align-items:center;gap:8px;}
 .tracker-icon{font-size:14px;}
 
+/* Microphone */
+.mic-bar{background:#F0EBF8;border:1px solid #C8A8E8;border-radius:var(--radius-sm);padding:9px 13px;margin-bottom:13px;display:flex;align-items:center;gap:10px;font-family:sans-serif;font-size:13px;}
+.mic-btn{width:44px;height:44px;border-radius:50%;border:none;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.18s;flex-shrink:0;}
+.mic-btn.idle{background:#9B59B6;color:white;}
+.mic-btn.idle:hover{background:#7D3C98;}
+.mic-btn.listening{background:#E74C3C;color:white;animation:mic-pulse 1s infinite;}
+.mic-btn.processing{background:#F39C12;color:white;}
+@keyframes mic-pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.12);}}
+.mic-status{font-size:12px;color:#6C3483;flex:1;}
+.mic-transcript{background:white;border:1px solid #C8A8E8;border-radius:var(--radius-sm);padding:8px 11px;font-size:13px;color:var(--ink);min-height:36px;margin-top:8px;line-height:1.5;font-style:italic;}
+.mic-transcript:empty::before{content:'Student response will appear here...';color:var(--ink3);}
+.retry-chip{display:inline-block;font-size:11px;background:#FAEEDA;color:#633806;border-radius:10px;padding:2px 8px;margin-left:6px;font-family:sans-serif;}
+
 /* Responsive */
 @media(max-width:480px){
   .student-grid{grid-template-columns:1fr 1fr;}
@@ -204,6 +217,16 @@ body{font-family:'Georgia',serif;background:var(--parch);color:var(--ink);min-he
           <option value="1.1">Fast</option>
         </select>
       </div>
+    </div>
+
+    <!-- Microphone bar -->
+    <div class="mic-bar" id="mic-bar">
+      <button class="mic-btn idle" id="mic-btn" onclick="toggleMic()" title="Tap to speak">🎤</button>
+      <div style="flex:1">
+        <div class="mic-status" id="mic-status">Tap 🎤 to answer by speaking</div>
+        <div class="mic-transcript" id="mic-transcript"></div>
+      </div>
+      <button class="rbtn" id="mic-clear" onclick="clearTranscript()" style="display:none">✕ Clear</button>
     </div>
 
     <!-- Speed timer (Math only) -->
@@ -684,6 +707,122 @@ async function nextQuestion(){
   } catch(e){ document.getElementById('ai-response').textContent='Connection error. Please try again.'; }
   btn.disabled=false; btn.innerHTML='Next →';
 }
-</script>
-</body>
-</html>
+// ══════════════════════════════════════════════
+// MICROPHONE / SPEECH RECOGNITION
+// ══════════════════════════════════════════════
+let recognition = null;
+let isListening = false;
+let micRetries = 0;
+const MAX_RETRIES = 3;
+
+function initMic() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    document.getElementById('mic-status').textContent = 'Microphone not supported on this browser. Use Chrome or Edge.';
+    document.getElementById('mic-btn').style.display = 'none';
+    return false;
+  }
+  recognition = new SpeechRecognition();
+  recognition.continuous = false;
+  recognition.interimResults = true;
+
+  recognition.onstart = () => {
+    isListening = true;
+    setMicState('listening');
+  };
+
+  recognition.onresult = (event) => {
+    let interim = '';
+    let final = '';
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const t = event.results[i][0].transcript;
+      if (event.results[i].isFinal) final += t;
+      else interim += t;
+    }
+    const display = final || interim;
+    document.getElementById('mic-transcript').textContent = display;
+    document.getElementById('mic-clear').style.display = display ? 'block' : 'none';
+    if (final) {
+      micRetries = 0;
+      setMicState('idle');
+      document.getElementById('mic-status').textContent = '✓ Got it! Tap 🎤 to speak again or use buttons above.';
+    }
+  };
+
+  recognition.onerror = (event) => {
+    isListening = false;
+    if (event.error === 'no-speech') {
+      micRetries++;
+      if (micRetries < MAX_RETRIES) {
+        document.getElementById('mic-status').textContent = `Didn't catch that — try again (${MAX_RETRIES - micRetries} tries left)`;
+      } else {
+        micRetries = 0;
+        document.getElementById('mic-status').textContent = "That's okay! Try speaking more clearly or use a different answer method.";
+      }
+    } else if (event.error === 'not-allowed') {
+      document.getElementById('mic-status').textContent = 'Microphone access denied. Please allow microphone in browser settings.';
+    } else {
+      document.getElementById('mic-status').textContent = 'Microphone error — tap to try again.';
+    }
+    setMicState('idle');
+  };
+
+  recognition.onend = () => {
+    isListening = false;
+    if (document.getElementById('mic-btn').classList.contains('listening')) {
+      setMicState('idle');
+    }
+  };
+
+  return true;
+}
+
+function setMicState(state) {
+  const btn = document.getElementById('mic-btn');
+  btn.className = 'mic-btn ' + state;
+  const statusEl = document.getElementById('mic-status');
+  if (state === 'listening') {
+    btn.textContent = '⏹';
+    statusEl.textContent = '🔴 Listening... speak now';
+    stopRead();
+  } else if (state === 'processing') {
+    btn.textContent = '⏳';
+    statusEl.textContent = 'Processing...';
+  } else {
+    btn.textContent = '🎤';
+    if (!document.getElementById('mic-transcript').textContent) {
+      statusEl.textContent = 'Tap 🎤 to answer by speaking';
+    }
+  }
+}
+
+function toggleMic() {
+  if (!recognition) {
+    if (!initMic()) return;
+  }
+  // Set language based on subject
+  const isSpanish = curSubject && curSubject.id && curSubject.id.includes('spanish');
+  const isLJ = curStudent === 'LJ';
+  recognition.lang = isSpanish ? 'es-MX' : 'en-US';
+
+  if (isListening) {
+    recognition.stop();
+    isListening = false;
+    setMicState('idle');
+  } else {
+    try {
+      recognition.start();
+    } catch(e) {
+      recognition = null;
+      initMic();
+      try { recognition.start(); } catch(e2) {}
+    }
+  }
+}
+
+function clearTranscript() {
+  document.getElementById('mic-transcript').textContent = '';
+  document.getElementById('mic-clear').style.display = 'none';
+  document.getElementById('mic-status').textContent = 'Tap 🎤 to answer by speaking';
+  micRetries = 0;
+}
