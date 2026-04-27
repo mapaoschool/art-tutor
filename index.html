@@ -1120,11 +1120,26 @@ async function searchImages(keywords) {
       }
     } catch(e) {}
   }
-  // Fallback: Unsplash
+  // Fallback: Wikimedia Commons search
   if (images.length === 0) {
     for (const kw of keywords) {
-      const query = encodeURIComponent(kw.replace(/\s+/g,','));
-      images.push({ url: `https://source.unsplash.com/400x300/?${query}`, label: kw });
+      try {
+        const encoded = encodeURIComponent(kw);
+        const url = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch=${encoded}&gsrnamespace=6&prop=imageinfo&iiprop=url|mime&format=json&origin=*&gsrlimit=3`;
+        const r = await fetch(url);
+        const d = await r.json();
+        const pages = d.query?.pages;
+        if (pages) {
+          for (const page of Object.values(pages)) {
+            const imgUrl = page?.imageinfo?.[0]?.url;
+            const mime = page?.imageinfo?.[0]?.mime;
+            if (imgUrl && mime && mime.startsWith('image/') && !mime.includes('svg') && !imgUrl.includes('Icon')) {
+              images.push({ url: imgUrl, label: kw });
+              break;
+            }
+          }
+        }
+      } catch(e) {}
     }
   }
   return images;
