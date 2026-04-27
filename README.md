@@ -1,4 +1,4 @@
-# Ma Pao's Art Tutor
+# Ma Pao's Classical Catholic Homeschool Tutor
 **Augsburg's Drawing, Book I — Adaptive AI Tutor**
 
 Ma Pao's Classical Catholic Homeschool Program
