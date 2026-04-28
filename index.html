@@ -57,138 +57,162 @@ body{font-family:'Georgia',serif;background:var(--parch);color:var(--ink);min-he
 .subj-progress{height:3px;background:var(--parch3);border-radius:2px;margin-top:6px;overflow:hidden;}
 .subj-progress-fill{height:100%;border-radius:2px;background:var(--gold);}
 
-/* ── TUTOR SCREEN ── */
-#tutor{background:var(--subj-bg);}
-.tutor-content{flex:1;overflow-y:auto;padding:16px 18px;transition:background 0.3s;}
+/* ── TUTOR SCREEN — TWO-COLUMN LAYOUT ── */
+#tutor{background:var(--subj-bg);display:flex;flex-direction:column;height:100vh;overflow:hidden;}
 
-/* ── CLASS TIMER — TOP ── */
-.class-timer-wrap{margin-bottom:13px;}
-.class-timer-bar{background:var(--parch2);border:1px solid var(--parch3);border-radius:var(--radius);padding:10px 16px;display:flex;align-items:center;gap:14px;font-family:sans-serif;}
-.class-timer-label{font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:0.07em;}
-.class-timer-display{font-size:22px;font-weight:bold;font-family:monospace;min-width:52px;}
-.class-timer-display.ok{color:var(--green);}
-.class-timer-display.warn{color:var(--gold);}
-.class-timer-display.urgent{color:var(--red);}
-.class-timer-track{flex:1;height:10px;background:var(--parch3);border-radius:5px;overflow:hidden;}
-.class-timer-fill{height:100%;border-radius:5px;transition:width 1s linear,background 0.5s;}
-.class-timer-fill.ok{background:var(--green);}
-.class-timer-fill.warn{background:var(--gold);}
-.class-timer-fill.urgent{background:var(--red);}
-.class-timer-btns{display:flex;gap:6px;}
-.ctbtn{padding:4px 10px;border-radius:14px;border:1px solid var(--parch3);background:white;color:var(--ink2);font-size:11px;cursor:pointer;font-family:sans-serif;transition:all 0.14s;}
+/* TOP BAR */
+.tutor-topbar{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--parch2);border-bottom:2px solid var(--parch3);flex-shrink:0;}
+.tutor-topbar .back-btn{background:none;border:none;font-size:18px;cursor:pointer;color:var(--gold);padding:4px 8px;}
+.keep-subj-btn{padding:7px 13px;border-radius:var(--radius-sm);border:none;background:#9B59B6;color:white;font-size:12px;font-weight:bold;cursor:pointer;font-family:sans-serif;white-space:nowrap;}
+.keep-subj-btn:hover{background:#7D3C98;}
+.begin-top-btn{flex:1;padding:10px 16px;border-radius:var(--radius-sm);border:none;background:var(--gold);color:white;font-size:14px;font-weight:bold;cursor:pointer;font-family:sans-serif;transition:all 0.15s;}
+.begin-top-btn:hover{background:var(--gold2);}
+.begin-top-btn:disabled{opacity:0.5;cursor:not-allowed;}
+
+/* TIMER in topbar */
+.topbar-timer{display:flex;align-items:center;gap:7px;font-family:sans-serif;flex-shrink:0;}
+.topbar-timer-icon{font-size:18px;}
+.topbar-timer-display{font-size:16px;font-weight:bold;font-family:monospace;min-width:46px;}
+.topbar-timer-display.ok{color:var(--green);}
+.topbar-timer-display.warn{color:var(--gold);}
+.topbar-timer-display.urgent{color:var(--red);}
+.topbar-timer-track{width:60px;height:7px;background:var(--parch3);border-radius:4px;overflow:hidden;}
+.topbar-timer-fill{height:100%;border-radius:4px;transition:width 1s linear,background 0.5s;}
+.topbar-timer-fill.ok{background:var(--green);}
+.topbar-timer-fill.warn{background:var(--gold);}
+.topbar-timer-fill.urgent{background:var(--red);}
+.topbar-timer-btns{display:flex;gap:4px;}
+.ctbtn{padding:3px 8px;border-radius:10px;border:1px solid var(--parch3);background:white;color:var(--ink2);font-size:10px;cursor:pointer;font-family:sans-serif;}
 .ctbtn:hover{border-color:var(--gold);color:var(--gold2);}
 
-/* Session card */
-.session-card{background:var(--parch2);border:1px solid var(--parch3);border-radius:var(--radius);overflow:hidden;margin-bottom:14px;box-shadow:var(--shadow);}
-.session-header{padding:10px 14px;border-bottom:1px solid var(--parch3);display:flex;align-items:center;gap:8px;font-size:11px;font-weight:bold;color:var(--ink3);text-transform:uppercase;letter-spacing:0.07em;font-family:sans-serif;}
-.live-dot{width:8px;height:8px;border-radius:50%;background:#2E9922;flex-shrink:0;animation:pulse 2s infinite;}
-@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
-.session-body{padding:15px;font-size:14px;line-height:1.85;color:var(--ink);min-height:100px;white-space:pre-wrap;}
-/* Highlight word being read */
-.session-body .word-wrap{display:inline;}
-.session-body mark.reading-word{background:var(--gold-light);border-radius:3px;padding:0 2px;transition:background 0.1s;}
-.session-cite{padding:8px 14px;border-top:1px solid var(--parch3);font-size:11px;color:var(--ink3);font-style:italic;font-family:sans-serif;}
+/* MAIN BODY — three columns */
+.tutor-body{flex:1;display:grid;grid-template-columns:160px 1fr 220px;gap:0;overflow:hidden;min-height:0;}
 
-/* Book cover image */
-.book-cover-wrap{display:flex;align-items:center;gap:13px;background:var(--parch2);border:1px solid var(--parch3);border-radius:var(--radius-sm);padding:10px 13px;margin-bottom:13px;}
-.book-cover-img{width:54px;height:74px;object-fit:cover;border-radius:4px;border:1px solid var(--parch3);background:var(--parch3);flex-shrink:0;}
-.book-cover-img.placeholder{display:flex;align-items:center;justify-content:center;font-size:28px;}
-.book-cover-info{flex:1;}
-.book-cover-title{font-size:13px;font-weight:bold;color:var(--ink);line-height:1.4;}
-.book-cover-sub{font-size:11px;color:var(--ink3);margin-top:3px;font-family:sans-serif;}
-.book-cover-link{font-size:11px;color:var(--blue);margin-top:5px;display:inline-block;}
+/* LEFT SIDEBAR */
+.tutor-left{background:var(--parch2);border-right:1px solid var(--parch3);display:flex;flex-direction:column;gap:0;overflow-y:auto;padding:10px 8px;flex-shrink:0;}
+.left-section{margin-bottom:10px;}
+.left-label{font-size:9px;font-weight:bold;color:var(--ink3);text-transform:uppercase;letter-spacing:0.08em;font-family:sans-serif;margin-bottom:5px;}
 
-/* Book link */
-.book-link-box{background:var(--blue-light);border:1px solid #A8C8F0;border-radius:var(--radius-sm);padding:10px 13px;margin-bottom:13px;display:flex;align-items:center;gap:9px;font-size:13px;}
-.book-link-box a{color:var(--blue);font-weight:bold;word-break:break-all;}
+/* Book cover */
+.book-cover-img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:6px;border:1px solid var(--parch3);background:var(--parch3);display:flex;align-items:center;justify-content:center;font-size:36px;margin-bottom:5px;}
+.book-cover-title{font-size:10px;font-weight:bold;color:var(--ink);line-height:1.3;margin-bottom:2px;}
+.book-cover-link{font-size:10px;color:var(--blue);display:inline-block;}
+
+/* Tracker in left */
+.tracker-left{background:var(--green-light);border:1px solid #A0D090;border-radius:var(--radius-sm);padding:6px 8px;font-size:10px;color:var(--green);font-family:sans-serif;line-height:1.5;}
+
+/* Open book button */
+.open-book-btn{display:block;width:100%;padding:7px 6px;border-radius:var(--radius-sm);border:1.5px solid var(--gold);background:var(--gold-light);color:var(--gold2);font-size:11px;font-weight:bold;font-family:sans-serif;cursor:pointer;text-align:center;text-decoration:none;transition:all 0.14s;margin-bottom:6px;}
+.open-book-btn:hover{background:var(--gold);color:white;}
+
+/* Images in left sidebar */
+.img-section-left{margin-top:4px;}
+.img-grid-left{display:flex;flex-direction:column;gap:5px;}
+.img-card-left{border-radius:var(--radius-sm);overflow:hidden;border:1px solid var(--parch3);}
+.img-card-left img{width:100%;height:80px;object-fit:cover;display:block;}
+.img-card-label{font-size:9px;color:var(--ink3);padding:2px 5px;font-family:sans-serif;background:var(--parch2);}
+.img-loading{font-size:10px;color:var(--ink3);font-family:sans-serif;padding:4px 0;}
+
+/* Diag banner in left */
+.diag-banner{background:var(--blue-light);border:1px solid #A8C8F0;border-radius:var(--radius-sm);padding:7px 8px;font-family:sans-serif;font-size:10px;color:var(--blue);line-height:1.4;}
+.diag-banner strong{display:block;margin-bottom:3px;font-size:11px;}
+
+/* Math speed timer in left */
+.timer-bar-left{background:var(--parch3);border-radius:var(--radius-sm);padding:7px 8px;font-family:sans-serif;}
+.timer-bar-left .tbl-label{font-size:9px;color:var(--ink3);text-transform:uppercase;letter-spacing:0.07em;}
+.timer-display{font-size:26px;font-weight:bold;color:var(--gold);font-family:monospace;}
+.timer-display.urgent{color:var(--red);}
+.timer-track{height:6px;background:var(--parch2);border-radius:3px;overflow:hidden;margin:4px 0;}
+.timer-fill{height:100%;border-radius:3px;background:var(--gold);transition:width 0.1s linear;}
+.timer-fill.urgent{background:var(--red);}
+.timer-btns{display:flex;gap:4px;margin-top:4px;}
+
+/* CENTER — reading area */
+.tutor-center{display:flex;flex-direction:column;overflow:hidden;background:white;}
 
 /* Read aloud bar */
-.read-bar{background:var(--gold-light);border:1px solid #E8C870;border-radius:var(--radius-sm);padding:9px 13px;margin-bottom:13px;display:flex;align-items:center;gap:10px;font-family:sans-serif;font-size:13px;}
-.read-bar-btns{display:flex;gap:7px;margin-left:auto;flex-wrap:wrap;}
-.rbtn{padding:5px 12px;border-radius:20px;border:1px solid var(--gold);background:white;color:var(--gold2);font-size:12px;cursor:pointer;font-family:sans-serif;transition:all 0.14s;}
+.read-bar{background:var(--gold-light);border-bottom:1px solid #E8C870;padding:7px 12px;display:flex;align-items:center;gap:8px;font-family:sans-serif;font-size:12px;flex-shrink:0;}
+.read-bar-btns{display:flex;gap:5px;margin-left:auto;flex-wrap:wrap;align-items:center;}
+.rbtn{padding:4px 10px;border-radius:16px;border:1px solid var(--gold);background:white;color:var(--gold2);font-size:11px;cursor:pointer;font-family:sans-serif;transition:all 0.14s;}
 .rbtn:hover{background:var(--gold);color:white;}
 .rbtn.playing{background:var(--gold);color:white;}
 
-/* ── RESPONSE AREA — now adjacent to AI card ── */
-.lesson-response-wrap{margin-bottom:13px;}
-.response-box{border:1px solid var(--parch3);border-radius:var(--radius);overflow:hidden;margin-bottom:8px;}
-.response-header{padding:8px 13px;background:var(--parch2);font-size:11px;font-weight:bold;color:var(--ink3);text-transform:uppercase;letter-spacing:0.07em;border-bottom:1px solid var(--parch3);font-family:sans-serif;}
-.response-body{padding:13px;min-height:60px;font-size:13px;line-height:1.65;color:var(--ink);}
+/* Session body — scrollable reading area */
+.session-scroll{flex:1;overflow-y:auto;padding:14px 16px;}
+.session-body{font-size:14px;line-height:1.85;color:var(--ink);white-space:pre-wrap;}
+.session-body .hl-word.reading-word{background:var(--gold-light);border-radius:3px;padding:0 2px;}
+.session-cite{font-size:11px;color:var(--ink3);font-style:italic;font-family:sans-serif;margin-top:10px;padding-top:8px;border-top:1px solid var(--parch3);}
 
-/* Student input — inside the response wrap */
-.student-input-bar{display:flex;gap:8px;align-items:flex-end;margin-bottom:8px;}
-.student-input-box{flex:1;border:1.5px solid var(--parch3);border-radius:var(--radius-sm);padding:9px 12px;font-size:14px;font-family:'Georgia',serif;color:var(--ink);background:white;resize:none;min-height:42px;max-height:120px;transition:border-color 0.15s;line-height:1.5;}
+/* Student input area — bottom of center */
+.student-input-area{border-top:2px solid var(--parch3);padding:10px 12px;background:var(--parch2);flex-shrink:0;}
+.student-input-bar{display:flex;gap:8px;align-items:flex-end;}
+.student-input-box{flex:1;border:1.5px solid var(--parch3);border-radius:var(--radius-sm);padding:8px 11px;font-size:13px;font-family:'Georgia',serif;color:var(--ink);background:white;resize:none;min-height:38px;max-height:100px;transition:border-color 0.15s;line-height:1.5;}
 .student-input-box:focus{outline:none;border-color:var(--gold);}
 .student-input-box::placeholder{color:var(--ink3);font-style:italic;}
-.student-send-btn{padding:9px 16px;background:var(--gold);color:white;border:none;border-radius:var(--radius-sm);font-size:13px;cursor:pointer;font-family:sans-serif;transition:all 0.15s;flex-shrink:0;height:42px;}
+.student-send-btn{padding:8px 14px;background:var(--gold);color:white;border:none;border-radius:var(--radius-sm);font-size:12px;cursor:pointer;font-family:sans-serif;transition:all 0.15s;flex-shrink:0;height:38px;}
 .student-send-btn:hover{background:var(--gold2);}
 .student-send-btn:disabled{opacity:0.4;cursor:not-allowed;}
-.student-answer-display{background:var(--parch2);border:1px solid var(--parch3);border-radius:var(--radius-sm);padding:9px 12px;font-size:13px;color:var(--ink);margin-bottom:8px;line-height:1.6;display:none;}
-.student-answer-display strong{color:var(--gold2);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:3px;font-family:sans-serif;}
 
-/* Feedback area — inside response wrap */
-#fb-area{margin-bottom:0;}
-.feedback{padding:10px 13px;border-radius:var(--radius-sm);font-size:13px;font-family:sans-serif;line-height:1.6;}
-
-/* Hint + warn */
-.hint-warn{background:var(--red-light);border:1px solid #F0A898;border-radius:var(--radius-sm);padding:9px 13px;font-size:12px;color:var(--red);display:flex;align-items:center;gap:7px;margin-bottom:11px;font-family:sans-serif;}
-.warn-icon{width:18px;height:18px;border-radius:50%;background:var(--red);color:white;font-size:10px;font-weight:bold;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-
-/* Buttons */
-.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:13px;}
-.btn{padding:7px 14px;border-radius:var(--radius-sm);font-size:12px;cursor:pointer;border:1.5px solid var(--parch3);background:var(--parch2);color:var(--ink2);transition:all 0.14s;font-family:sans-serif;}
+/* Action buttons row */
+.action-row{display:flex;gap:6px;flex-wrap:wrap;padding:8px 12px;border-top:1px solid var(--parch3);background:var(--parch2);flex-shrink:0;}
+.btn{padding:6px 12px;border-radius:var(--radius-sm);font-size:11px;cursor:pointer;border:1.5px solid var(--parch3);background:white;color:var(--ink2);transition:all 0.14s;font-family:sans-serif;}
 .btn:hover{border-color:var(--gold);color:var(--ink);background:var(--gold-light);}
 .btn-gold{background:var(--gold);color:white;border-color:var(--gold);}
 .btn-gold:hover{background:var(--gold2);border-color:var(--gold2);}
 .btn:disabled{opacity:0.45;cursor:not-allowed;}
+.btn-row{display:flex;gap:6px;flex-wrap:wrap;}
 
-/* Speed Timer (Math) */
-.timer-bar{background:var(--parch2);border:1px solid var(--parch3);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:13px;display:flex;align-items:center;gap:12px;font-family:sans-serif;}
-.timer-display{font-size:32px;font-weight:bold;color:var(--gold);font-family:monospace;min-width:50px;}
-.timer-display.urgent{color:var(--red);}
-.timer-track{flex:1;height:8px;background:var(--parch3);border-radius:4px;overflow:hidden;}
-.timer-fill{height:100%;border-radius:4px;background:var(--gold);transition:width 0.1s linear;}
-.timer-fill.urgent{background:var(--red);}
-.timer-btns{display:flex;gap:6px;}
+/* RIGHT SIDEBAR — questions & responses */
+.tutor-right{border-left:1px solid var(--parch3);display:flex;flex-direction:column;overflow:hidden;background:var(--parch);}
+.right-section{padding:10px 10px 0;flex-shrink:0;}
+.right-label{font-size:9px;font-weight:bold;color:var(--ink3);text-transform:uppercase;letter-spacing:0.08em;font-family:sans-serif;margin-bottom:5px;}
 
-/* Spinner */
-.spinner{display:inline-block;width:13px;height:13px;border:2px solid var(--parch3);border-top-color:var(--gold);border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:5px;}
-@keyframes spin{to{transform:rotate(360deg);}}
+/* AI questions/feedback box */
+.ai-question-box{flex:1;overflow-y:auto;padding:10px;font-size:12px;line-height:1.7;color:var(--ink);background:var(--parch);}
+.ai-question-box .live-dot{width:7px;height:7px;border-radius:50%;background:#2E9922;display:inline-block;margin-right:5px;animation:pulse 2s infinite;}
 
-/* Session tracker chip */
-.tracker{background:var(--green-light);border:1px solid #A0D090;border-radius:var(--radius-sm);padding:8px 13px;margin-bottom:13px;font-size:12px;color:var(--green);font-family:sans-serif;display:flex;align-items:center;gap:8px;}
-.tracker-icon{font-size:14px;}
+/* Student response display */
+.student-response-panel{border-top:2px solid var(--parch3);padding:10px;background:var(--parch2);flex-shrink:0;}
+.student-answer-display{font-size:12px;color:var(--ink);line-height:1.6;display:none;}
+.student-answer-display strong{color:var(--gold2);font-size:10px;text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:3px;font-family:sans-serif;}
 
-/* Images */
-.img-section{margin-bottom:13px;}
-.img-section-title{font-size:11px;font-weight:bold;color:var(--ink3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;font-family:sans-serif;display:flex;align-items:center;gap:6px;}
-.img-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
-.img-card{border-radius:var(--radius-sm);overflow:hidden;border:1px solid var(--parch3);background:var(--parch2);}
-.img-card img{width:100%;height:120px;object-fit:cover;display:block;}
-.img-card-label{font-size:11px;color:var(--ink3);padding:4px 7px;font-family:sans-serif;}
-.img-loading{font-size:12px;color:var(--ink3);font-family:sans-serif;padding:8px 0;}
-
-/* Mic */
-.mic-bar{background:#F0EBF8;border:1px solid #C8A8E8;border-radius:var(--radius-sm);padding:9px 13px;margin-bottom:8px;display:flex;align-items:center;gap:10px;font-family:sans-serif;font-size:13px;}
-.mic-btn{width:44px;height:44px;border-radius:50%;border:none;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.18s;flex-shrink:0;}
+/* Mic in right panel */
+.mic-compact{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.mic-btn{width:38px;height:38px;border-radius:50%;border:none;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.18s;flex-shrink:0;}
 .mic-btn.idle{background:#9B59B6;color:white;}
 .mic-btn.idle:hover{background:#7D3C98;}
 .mic-btn.listening{background:#E74C3C;color:white;animation:mic-pulse 1s infinite;}
 .mic-btn.processing{background:#F39C12;color:white;}
 @keyframes mic-pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.12);}}
-.mic-status{font-size:12px;color:#6C3483;flex:1;}
-.mic-transcript{background:white;border:1px solid #C8A8E8;border-radius:var(--radius-sm);padding:8px 11px;font-size:13px;color:var(--ink);min-height:36px;margin-top:8px;line-height:1.5;font-style:italic;}
-.mic-transcript:empty::before{content:'Student response will appear here...';color:var(--ink3);}
-.retry-chip{display:inline-block;font-size:11px;background:#FAEEDA;color:#633806;border-radius:10px;padding:2px 8px;margin-left:6px;font-family:sans-serif;}
+.mic-status{font-size:10px;color:#6C3483;flex:1;font-family:sans-serif;}
+.mic-transcript{background:white;border:1px solid #C8A8E8;border-radius:var(--radius-sm);padding:6px 9px;font-size:11px;color:var(--ink);min-height:30px;line-height:1.5;font-style:italic;margin-top:5px;}
+.mic-transcript:empty::before{content:'Voice answer here...';color:var(--ink3);}
+
+/* Feedback in right */
+.feedback{padding:8px 10px;border-radius:var(--radius-sm);font-size:11px;font-family:sans-serif;line-height:1.6;margin-top:6px;}
+#fb-area{padding:6px 10px;}
+
+/* Hint warn */
+.hint-warn{background:var(--red-light);border:1px solid #F0A898;border-radius:var(--radius-sm);padding:7px 10px;font-size:11px;color:var(--red);display:flex;align-items:center;gap:6px;margin:6px 10px;font-family:sans-serif;}
+.warn-icon{width:16px;height:16px;border-radius:50%;background:var(--red);color:white;font-size:9px;font-weight:bold;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+/* Session tracker in right */
+.tracker{background:var(--green-light);border:1px solid #A0D090;border-radius:var(--radius-sm);padding:6px 9px;font-size:10px;color:var(--green);font-family:sans-serif;display:flex;align-items:center;gap:6px;margin:0 10px 6px;}
+.tracker-icon{font-size:12px;}
+
+/* Spinner */
+.spinner{display:inline-block;width:11px;height:11px;border:2px solid var(--parch3);border-top-color:var(--gold);border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:4px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
 
 /* Book page ref */
-.book-page-ref{background:var(--parch2);border:1px solid var(--parch3);border-radius:var(--radius-sm);padding:9px 13px;margin-bottom:13px;font-family:sans-serif;font-size:12px;color:var(--ink3);display:flex;align-items:center;gap:8px;}
+.book-page-ref{background:var(--parch2);border:1px solid var(--parch3);border-radius:var(--radius-sm);padding:6px 9px;font-family:sans-serif;font-size:10px;color:var(--ink3);display:flex;align-items:center;gap:6px;margin:0 10px 6px;}
 
-/* Math diagnostic banner */
-.diag-banner{background:var(--blue-light);border:1px solid #A8C8F0;border-radius:var(--radius);padding:14px 16px;margin-bottom:13px;font-family:sans-serif;font-size:13px;color:var(--blue);}
-.diag-banner strong{display:block;margin-bottom:6px;font-size:14px;}
-
-/* Responsive */
+/* Responsive — collapse to single column on small screens */
+@media(max-width:700px){
+  .tutor-body{grid-template-columns:1fr;}
+  .tutor-left,.tutor-right{display:none;}
+}
 @media(max-width:480px){
   .student-grid{grid-template-columns:1fr 1fr;}
   .subject-grid{grid-template-columns:1fr;}
@@ -246,162 +270,187 @@ body{font-family:'Georgia',serif;background:var(--parch);color:var(--ink);min-he
 
 <!-- ══════════════ TUTOR SCREEN ══════════════ -->
 <div id="tutor" class="screen">
-  <div class="nav-bar">
+
+  <!-- TOP BAR -->
+  <div class="tutor-topbar">
     <button class="back-btn" onclick="goSubjects()">←</button>
-    <div>
-      <div class="nav-title" id="tutor-title">Tutor</div>
-      <div class="nav-sub" id="tutor-sub"></div>
+    <button class="keep-subj-btn" onclick="goSubjects()">Keep Subject</button>
+    <button class="begin-top-btn" id="btn-begin-top" onclick="beginSession()">✦ Tap to Begin Today's Lesson</button>
+    <!-- Timer -->
+    <div class="topbar-timer">
+      <span class="topbar-timer-icon">⏱️</span>
+      <div>
+        <div class="topbar-timer-display ok" id="class-timer-display">15:00</div>
+        <div class="topbar-timer-track"><div class="topbar-timer-fill ok" id="class-timer-fill" style="width:100%"></div></div>
+      </div>
+      <div class="topbar-timer-btns">
+        <button class="ctbtn" onclick="startClassTimer()">▶</button>
+        <button class="ctbtn" onclick="resetClassTimer()">↺</button>
+      </div>
     </div>
   </div>
-  <div class="tutor-content" id="tutor-content">
 
-    <!-- CLASS TIMER — top of screen -->
-    <div class="class-timer-wrap" id="class-timer-wrap">
-      <div class="class-timer-bar">
-        <div>
-          <div class="class-timer-label">Class time</div>
-          <div class="class-timer-display ok" id="class-timer-display">15:00</div>
-        </div>
-        <div class="class-timer-track"><div class="class-timer-fill ok" id="class-timer-fill" style="width:100%"></div></div>
-        <div class="class-timer-btns">
-          <button class="ctbtn" onclick="startClassTimer()">▶ Start</button>
-          <button class="ctbtn" onclick="resetClassTimer()">↺</button>
-        </div>
-      </div>
-    </div>
+  <!-- THREE-COLUMN BODY -->
+  <div class="tutor-body">
 
-    <!-- Session tracker -->
-    <div class="tracker" id="tracker-box">
-      <span class="tracker-icon">📍</span>
-      <span id="tracker-text">Loading session...</span>
-    </div>
+    <!-- ══ LEFT SIDEBAR ══ -->
+    <div class="tutor-left" id="tutor-left">
 
-    <!-- BEGIN SESSION — top position for students -->
-    <div style="margin-bottom:13px;">
-      <button class="btn btn-gold" id="btn-begin-top" onclick="beginSession()" style="width:100%;padding:14px;font-size:15px;border-radius:var(--radius);">✦ Begin Today's Lesson</button>
-    </div>
-
-    <!-- Book cover + link -->
-    <div class="book-cover-wrap" id="book-cover-wrap" style="display:none">
-      <div class="book-cover-img placeholder" id="book-cover-img">📖</div>
-      <div class="book-cover-info">
+      <!-- Book cover -->
+      <div class="left-section">
+        <div class="left-label">📖 Book</div>
+        <div class="book-cover-img" id="book-cover-img">📖</div>
         <div class="book-cover-title" id="book-cover-title"></div>
-        <div class="book-cover-sub" id="book-cover-sub"></div>
-        <a class="book-cover-link" id="book-cover-link" href="#" target="_blank" style="display:none">Open book PDF ↗</a>
+        <a class="book-cover-link open-book-btn" id="book-cover-link" href="#" target="_blank" style="display:none">Open Book ↗</a>
       </div>
-    </div>
 
-    <!-- Math diagnostic banner (first-time only) -->
-    <div class="diag-banner" id="diag-banner" style="display:none">
-      <strong>📋 First session — Placement Test</strong>
-      This is the first Math session for this student. The tutor will begin with a short diagnostic to find the right starting level before regular lessons begin.
-    </div>
-
-    <!-- Read aloud bar -->
-    <div class="read-bar" id="read-bar">
-      🔊 <span id="read-bar-label">Read aloud</span>
-      <div class="read-bar-btns">
-        <button class="rbtn" id="btn-read" onclick="toggleRead()">▶ Read</button>
-        <button class="rbtn" id="btn-stop" onclick="stopRead()">■ Stop</button>
-        <select id="voice-speed" onchange="updateSpeed()" style="font-size:11px;border:1px solid var(--gold);border-radius:4px;padding:2px 4px;background:white;font-family:sans-serif;">
-          <option value="0.7">Slow</option>
-          <option value="0.9" selected>Medium</option>
-          <option value="1.1">Fast</option>
-        </select>
-        <select id="voice-picker" onchange="onVoicePickerChange()" style="font-size:11px;border:1px solid var(--gold);border-radius:4px;padding:2px 4px;background:white;font-family:sans-serif;max-width:140px;" title="Choose reading voice">
-          <option value="auto">🎙 Auto voice</option>
-        </select>
+      <!-- Session tracker -->
+      <div class="left-section">
+        <div class="left-label">📍 Progress</div>
+        <div class="tracker-left" id="tracker-text">Loading...</div>
       </div>
-    </div>
 
-    <!-- Speed timer (Math only) -->
-    <div class="timer-bar" id="timer-bar" style="display:none">
-      <div>
-        <div style="font-size:11px;color:var(--ink3);font-family:sans-serif;margin-bottom:2px">SPEED TIMER</div>
+      <!-- Math diagnostic -->
+      <div class="diag-banner" id="diag-banner" style="display:none">
+        <strong>📋 Placement Test</strong>
+        First Math session — diagnostic will run before regular lessons.
+      </div>
+
+      <!-- Math speed timer -->
+      <div class="timer-bar-left" id="timer-bar" style="display:none">
+        <div class="tbl-label">Speed Timer</div>
         <div class="timer-display" id="timer-display">5.0</div>
+        <div class="timer-track"><div class="timer-fill" id="timer-fill" style="width:100%"></div></div>
+        <div class="timer-btns">
+          <button class="btn" onclick="startTimer()">▶</button>
+          <button class="btn" onclick="resetTimer()">↺</button>
+        </div>
       </div>
-      <div class="timer-track"><div class="timer-fill" id="timer-fill" style="width:100%"></div></div>
-      <div class="timer-btns">
-        <button class="btn" onclick="startTimer()">▶ Start</button>
-        <button class="btn" onclick="resetTimer()">↺</button>
+
+      <!-- Images related to lesson -->
+      <div class="left-section img-section-left" id="img-section" style="display:none">
+        <div class="left-label">🖼️ Images</div>
+        <div id="img-loading" class="img-loading" style="display:none"><span class="spinner"></span> Loading...</div>
+        <div class="img-grid-left" id="img-grid"></div>
       </div>
-    </div>
 
-    <!-- AI session card -->
-    <div class="session-card">
-      <div class="session-header"><span class="live-dot"></span>AI Tutor</div>
-      <div class="session-body" id="ai-response">Tap "Begin Lesson" to start today's session.</div>
-      <div class="session-cite" id="ai-cite"></div>
-    </div>
+      <!-- Book page ref -->
+      <div id="book-page-btn-wrap" style="display:none">
+        <div class="book-page-ref">
+          <span>📖</span>
+          <span style="flex:1;font-size:10px"><span id="book-page-label"></span></span>
+          <a id="book-page-btn" href="#" target="_blank" style="color:var(--blue);font-size:10px;">PDF ↗</a>
+        </div>
+      </div>
 
-    <!-- ── RESPONSE AREA — directly below AI card ── -->
-    <div class="lesson-response-wrap">
+    </div><!-- end tutor-left -->
+
+    <!-- ══ CENTER — reading area ══ -->
+    <div class="tutor-center">
+
+      <!-- Read aloud bar -->
+      <div class="read-bar" id="read-bar">
+        🔊
+        <div class="read-bar-btns">
+          <button class="rbtn" id="btn-read" onclick="toggleRead()">▶ Read</button>
+          <button class="rbtn" id="btn-stop" onclick="stopRead()">■ Stop</button>
+          <select id="voice-speed" onchange="updateSpeed()" style="font-size:11px;border:1px solid var(--gold);border-radius:4px;padding:2px 4px;background:white;font-family:sans-serif;">
+            <option value="0.7">Slow</option>
+            <option value="0.9" selected>Medium</option>
+            <option value="1.1">Fast</option>
+          </select>
+          <select id="voice-picker" onchange="onVoicePickerChange()" style="font-size:11px;border:1px solid var(--gold);border-radius:4px;padding:2px 4px;background:white;font-family:sans-serif;max-width:120px;">
+            <option value="auto">🎙 Auto voice</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Scrollable lesson text -->
+      <div class="session-scroll">
+        <div class="session-body" id="ai-response">Tap "Begin Today's Lesson" to start.</div>
+        <div class="session-cite" id="ai-cite"></div>
+      </div>
+
+      <!-- Student text input -->
+      <div class="student-input-area">
+        <div class="student-input-bar">
+          <textarea class="student-input-box" id="student-input" placeholder="Type your answer here..." rows="1" onkeydown="handleInputKey(event)" oninput="autoGrow(this)"></textarea>
+          <button class="student-send-btn" id="btn-send" onclick="submitTextAnswer()">Send ↑</button>
+        </div>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="action-row">
+        <button class="btn btn-gold" id="btn-begin" onclick="beginSession()">✦ Begin</button>
+        <button class="btn" id="btn-correct" onclick="markResponse('correct')" disabled>✓ Correct</button>
+        <button class="btn" id="btn-partial" onclick="markResponse('partial')" disabled>Partial</button>
+        <button class="btn" id="btn-wrong" onclick="markResponse('wrong')" disabled>Reteach</button>
+        <button class="btn" id="btn-hint" onclick="giveHint()" disabled>Hint</button>
+        <button class="btn" id="btn-next" onclick="nextQuestion()" disabled>Next →</button>
+      </div>
+
+      <!-- Second begin button at bottom -->
+      <div style="padding:8px 12px;border-top:1px solid var(--parch3);background:var(--parch2);">
+        <button class="begin-top-btn" onclick="beginSession()" style="width:100%;font-size:13px;padding:8px;">✦ Tap to Begin Today's Lesson</button>
+      </div>
+
+    </div><!-- end tutor-center -->
+
+    <!-- ══ RIGHT SIDEBAR — questions & responses ══ -->
+    <div class="tutor-right">
 
       <!-- Hint warning -->
       <div class="hint-warn" id="hint-warn" style="display:none">
         <div class="warn-icon">!</div>
-        <span>This student has used <strong id="hint-ct">3</strong> hints in a row. Teacher check-in recommended.</span>
+        <span><strong id="hint-ct">3</strong> hints used. Teacher check-in recommended.</span>
       </div>
 
-      <!-- Microphone bar -->
-      <div class="mic-bar" id="mic-bar">
-        <button class="mic-btn idle" id="mic-btn" onclick="toggleMic()" title="Tap to speak">🎤</button>
-        <div style="flex:1">
-          <div class="mic-status" id="mic-status">Tap 🎤 to answer by speaking</div>
-          <div class="mic-transcript" id="mic-transcript"></div>
+      <!-- Tracker -->
+      <div class="tracker" id="tracker-box">
+        <span class="tracker-icon">📍</span>
+        <span id="tracker-text-right">Session info</span>
+      </div>
+
+      <!-- AI questions box -->
+      <div class="right-section">
+        <div class="right-label"><span class="live-dot"></span> Questions or anything said by AI tutor</div>
+      </div>
+      <div class="ai-question-box" id="ai-question-box">
+        <span style="color:var(--ink3);font-size:12px;font-family:sans-serif;">Questions and tutor feedback will appear here...</span>
+      </div>
+
+      <!-- Student response panel -->
+      <div class="student-response-panel">
+        <div class="right-label" style="margin-bottom:6px;">Student response</div>
+
+        <!-- Mic -->
+        <div class="mic-compact">
+          <button class="mic-btn idle" id="mic-btn" onclick="toggleMic()" title="Tap to speak">🎤</button>
+          <div style="flex:1">
+            <div class="mic-status" id="mic-status">Tap 🎤 to answer by voice</div>
+          </div>
+          <button class="rbtn" id="mic-clear" onclick="clearTranscript()" style="display:none;font-size:10px;">✕</button>
         </div>
-        <button class="rbtn" id="mic-clear" onclick="clearTranscript()" style="display:none">✕ Clear</button>
+        <div class="mic-transcript" id="mic-transcript"></div>
+
+        <!-- Student answer display -->
+        <div class="student-answer-display" id="student-answer-display" style="margin-top:6px;">
+          <strong>Student answered:</strong>
+          <span id="student-answer-text"></span>
+        </div>
+
+        <!-- AI feedback -->
+        <div id="fb-area"></div>
+
+        <!-- Teacher response area -->
+        <div style="margin-top:8px;font-size:10px;font-weight:bold;color:var(--ink3);text-transform:uppercase;letter-spacing:0.07em;font-family:sans-serif;">Student response will appear here</div>
+        <div id="response-body" style="font-size:12px;color:var(--ink);line-height:1.6;margin-top:4px;min-height:40px;"></div>
       </div>
 
-      <!-- Student text input -->
-      <div class="student-input-bar">
-        <textarea class="student-input-box" id="student-input" placeholder="Type your answer here..." rows="1" onkeydown="handleInputKey(event)" oninput="autoGrow(this)"></textarea>
-        <button class="student-send-btn" id="btn-send" onclick="submitTextAnswer()">Send ↑</button>
-      </div>
-      <div class="student-answer-display" id="student-answer-display">
-        <strong>Student answered:</strong>
-        <span id="student-answer-text"></span>
-      </div>
+    </div><!-- end tutor-right -->
 
-      <!-- AI feedback -->
-      <div id="fb-area"></div>
-
-      <!-- Response / feedback (teacher) -->
-      <div class="response-box" style="margin-top:8px;">
-        <div class="response-header">Teacher feedback</div>
-        <div class="response-body" id="response-body">Evaluate the student's response below.</div>
-      </div>
-
-    </div><!-- end lesson-response-wrap -->
-
-    <!-- Action buttons -->
-    <div class="btn-row">
-      <button class="btn btn-gold" id="btn-begin" onclick="beginSession()">✦ Begin Session</button>
-      <button class="btn" id="btn-correct" onclick="markResponse('correct')" disabled>✓ Correct</button>
-      <button class="btn" id="btn-partial" onclick="markResponse('partial')" disabled>Partial</button>
-      <button class="btn" id="btn-wrong" onclick="markResponse('wrong')" disabled>Reteach</button>
-      <button class="btn" id="btn-hint" onclick="giveHint()" disabled>Hint</button>
-      <button class="btn" id="btn-next" onclick="nextQuestion()" disabled>Next →</button>
-    </div>
-
-    <!-- Web images -->
-    <div id="img-section" class="img-section" style="display:none">
-      <div class="img-section-title">🖼️ Visual support</div>
-      <div id="img-loading" class="img-loading" style="display:none"><span class="spinner"></span> Finding images...</div>
-      <div class="img-grid" id="img-grid"></div>
-    </div>
-
-    <!-- Book page button — teacher reference only -->
-    <div id="book-page-btn-wrap" style="display:none">
-      <div class="book-page-ref">
-        <span>📖</span>
-        <span style="flex:1"><strong style="color:var(--ink2)">Teacher reference:</strong> <span id="book-page-label"></span></span>
-        <a id="book-page-btn" href="#" target="_blank" style="color:var(--blue);font-size:11px;white-space:nowrap;">Open PDF ↗</a>
-      </div>
-    </div>
-
-  </div>
-</div>
+  </div><!-- end tutor-body -->
+</div><!-- end tutor screen -->
 
 <script>
 // ══════════════════════════════════════════════
@@ -531,7 +580,7 @@ SUBJECTS.LJ = [
 const UNIVERSAL_RULES = `
 UNIVERSAL RULES (apply to every subject):
 1. SESSION TRACKING: At the start of every session, confirm with the student which lesson/chapter/fable they completed last time. Never repeat unless student requests review.
-2. SESSION LENGTH: Maximum 15 minutes for all subjects; up to 25 minutes for Literature. End the session as soon as the student has finished the reading and answered all questions — do NOT fill remaining time with extra activities or new topics. Summarize what was covered and preview the next session, then close.
+2. SESSION LENGTH: Maximum 15 minutes for all subjects; maximum 10 minutes for Math and Arithmetic. End the session as soon as the student has finished the reading and answered all questions — do NOT fill remaining time with extra activities or new topics. Summarize what was covered and preview the next session, then close.
 3. CONTENT RESTRICTIONS: NEVER discuss gender ideology, sex education, DEI ideology, evolution, Darwinism, ecology (as ideology), vulgarity, critical race theory, or anti-Catholic content. Redirect gently.
 4. ADAPTIVE TEACHING: If struggling, present concept in a DIFFERENT way (analogy, story, visual). Do not repeat the same explanation.
 5. VISUAL SUPPORT: Generate images when needed. If unable, say: "Ask your teacher to show you a picture of [X]."
@@ -595,7 +644,7 @@ function saveSession(student, subjectId, data){
 // ══════════════════════════════════════════════
 function startClassTimer(){
   if(classTimerInterval) return;
-  classTimerTotal = curSubject && ['narnia','aesop','bible','history','science'].some(k=>curSubject.id.includes(k)) ? 25*60 : 15*60;
+  classTimerTotal = curSubject && curSubject.isMath ? 10*60 : 15*60;
   classTimerSeconds = classTimerTotal;
   updateClassTimerDisplay();
   classTimerInterval = setInterval(()=>{
@@ -606,7 +655,7 @@ function startClassTimer(){
 }
 function resetClassTimer(){
   clearInterval(classTimerInterval); classTimerInterval=null;
-  classTimerTotal = curSubject && ['narnia','aesop','bible','history','science'].some(k=>curSubject.id.includes(k)) ? 25*60 : 15*60;
+  classTimerTotal = curSubject && curSubject.isMath ? 10*60 : 15*60;
   classTimerSeconds = classTimerTotal;
   updateClassTimerDisplay();
 }
@@ -619,10 +668,9 @@ function updateClassTimerDisplay(){
   d.textContent = `${mins}:${secs.toString().padStart(2,'0')}`;
   const pct = (classTimerSeconds / classTimerTotal) * 100;
   f.style.width = pct + '%';
-  // Color: green→gold→red
   const state = pct > 50 ? 'ok' : pct > 20 ? 'warn' : 'urgent';
-  d.className = 'class-timer-display ' + state;
-  f.className = 'class-timer-fill ' + state;
+  d.className = 'topbar-timer-display ' + state;
+  f.className = 'topbar-timer-fill ' + state;
 }
 
 // ══════════════════════════════════════════════
@@ -672,15 +720,14 @@ function openSubject(subjectId){
   stopRead();
   clearInterval(classTimerInterval); classTimerInterval = null;
 
-  document.getElementById('tutor-title').textContent = curSubject.name;
-  document.getElementById('tutor-sub').textContent = curSubject.tag;
+  document.getElementById('tutor-title') && (document.getElementById('tutor-title').textContent = curSubject.name);
+  document.getElementById('tutor-sub') && (document.getElementById('tutor-sub').textContent = curSubject.tag);
 
-  // Per-subject background color
-  const tc = document.getElementById('tutor-content');
-  tc.style.background = curSubject.bg || 'var(--parch)';
+  // Per-subject background color on body
+  document.body.style.background = curSubject.bg || 'var(--parch)';
 
   // Reset class timer
-  classTimerTotal = ['narnia','aesop','bible','history','science'].some(k=>curSubject.id.includes(k)) ? 25*60 : 15*60;
+  classTimerTotal = curSubject.isMath ? 10*60 : 15*60;
   classTimerSeconds = classTimerTotal;
   updateClassTimerDisplay();
 
@@ -688,7 +735,7 @@ function openSubject(subjectId){
   showBookCover();
 
   // Math timer + diagnostic banner
-  document.getElementById('timer-bar').style.display = curSubject.isMath ? 'flex' : 'none';
+  document.getElementById('timer-bar').style.display = curSubject.isMath ? 'block' : 'none';
   if(curSubject.isMath){
     const sess = getSession(curStudent, subjectId);
     document.getElementById('diag-banner').style.display = sess.sessionCount === 0 ? 'block' : 'none';
@@ -699,15 +746,17 @@ function openSubject(subjectId){
   // Update voice picker label
   updateVoiceLabel();
 
-  // Session tracker
+  // Session tracker (both elements)
   const sess = getSession(curStudent, subjectId);
-  document.getElementById('tracker-text').textContent =
-    `Last session: ${sess.lastLesson} · Sessions completed: ${sess.sessionCount}`;
+  const trackerText = `Last: ${sess.lastLesson} · Sessions: ${sess.sessionCount}`;
+  document.getElementById('tracker-text') && (document.getElementById('tracker-text').textContent = trackerText);
+  document.getElementById('tracker-text-right') && (document.getElementById('tracker-text-right').textContent = trackerText);
 
   // Reset UI
-  document.getElementById('ai-response').textContent = 'Tap "Begin Lesson" to start today\'s session.';
+  document.getElementById('ai-response').textContent = 'Tap "Begin Today\'s Lesson" to start.';
   document.getElementById('ai-cite').textContent = '';
-  document.getElementById('response-body').textContent = 'Evaluate the student\'s response below.';
+  document.getElementById('ai-question-box').innerHTML = '<span style="color:var(--ink3);font-size:12px;font-family:sans-serif;">Questions and tutor feedback will appear here...</span>';
+  document.getElementById('response-body').textContent = '';
   document.getElementById('fb-area').innerHTML = '';
   document.getElementById('hint-warn').style.display = 'none';
   document.getElementById('img-section').style.display = 'none';
@@ -720,6 +769,7 @@ function openSubject(subjectId){
   });
   document.getElementById('btn-begin').disabled = false;
   document.getElementById('btn-begin-top').disabled = false;
+  document.getElementById('btn-begin-top').textContent = '✦ Tap to Begin Today\'s Lesson';
   showScreen('tutor');
 }
 
@@ -728,42 +778,37 @@ function openSubject(subjectId){
 // ══════════════════════════════════════════════
 function showBookCover(){
   if(!curSubject) return;
-  const wrap = document.getElementById('book-cover-wrap');
   const img = document.getElementById('book-cover-img');
   const title = document.getElementById('book-cover-title');
-  const sub = document.getElementById('book-cover-sub');
   const link = document.getElementById('book-cover-link');
 
-  wrap.style.display = 'flex';
   title.textContent = curSubject.book || curSubject.name;
-  sub.textContent = curSubject.cite || '';
 
   if(curSubject.bookUrl){
     link.href = curSubject.bookUrl;
-    link.style.display = 'inline-block';
+    link.style.display = 'block';
   } else {
     link.style.display = 'none';
   }
 
-  // Use subject icon as placeholder, try to load a Wikimedia book cover
-  img.className = 'book-cover-img placeholder';
+  // Reset to emoji placeholder
+  img.style.cssText = '';
+  img.className = 'book-cover-img';
   img.textContent = curSubject.icon;
 
-  // Try Wikipedia/Wikimedia for a book/subject image
+  // Try Wikipedia for a book/subject image
   const searchQuery = curSubject.book.replace(/—.*$/, '').replace(/PDF|Español/gi,'').trim();
-  fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(searchQuery)}&prop=pageimages&pithumbsize=120&format=json&origin=*`)
+  fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(searchQuery)}&prop=pageimages&pithumbsize=160&format=json&origin=*`)
     .then(r=>r.json())
     .then(d=>{
       const pages = d.query?.pages;
       if(!pages) return;
       for(const p of Object.values(pages)){
         if(p.thumbnail?.source){
-          const el = document.createElement('img');
-          el.src = p.thumbnail.source;
-          el.alt = searchQuery;
-          el.className = 'book-cover-img';
-          el.onerror = ()=>{}; // keep placeholder on error
-          img.replaceWith(el);
+          img.textContent = '';
+          img.style.backgroundImage = `url('${p.thumbnail.source}')`;
+          img.style.backgroundSize = 'cover';
+          img.style.backgroundPosition = 'center';
           break;
         }
       }
@@ -838,7 +883,12 @@ Respond in plain, natural tutor voice — no markdown, no bullet symbols.`;
     }
     const text = data.content?.find(b=>b.type==='text')?.text || 'Could not load lesson. Please check your connection and try again.';
     document.getElementById('ai-response').textContent = text;
+    // Extract questions for right panel
     lastQuestion = extractLastQuestion(text);
+    const questions = text.match(/[^.!?]*\?[^?]*/g) || [];
+    document.getElementById('ai-question-box').innerHTML = questions.length
+      ? questions.map(q=>`<div style="background:var(--gold-light);border:1px solid #E8C870;border-radius:6px;padding:7px 9px;margin-bottom:6px;font-size:12px;color:var(--ink);">${q.trim()}</div>`).join('')
+      : `<div style="font-size:12px;color:var(--ink);line-height:1.7;">${text.substring(0,300)}...</div>`;
     document.getElementById('ai-cite').textContent = 'Source: ' + curSubject.cite;
     ['btn-correct','btn-partial','btn-wrong','btn-hint','btn-next'].forEach(id=>{
       document.getElementById(id).disabled = false;
@@ -1203,7 +1253,9 @@ function markResponse(type){
     sess.sessionCount++;
     sess.lastLesson = `Session ${sess.sessionCount} — ${curSubject.name}`;
     saveSession(curStudent, curSubject.id, sess);
-    document.getElementById('tracker-text').textContent = `Last session: ${sess.lastLesson} · Sessions: ${sess.sessionCount}`;
+    const t = `Last: ${sess.lastLesson} · Sessions: ${sess.sessionCount}`;
+    document.getElementById('tracker-text') && (document.getElementById('tracker-text').textContent = t);
+    document.getElementById('tracker-text-right') && (document.getElementById('tracker-text-right').textContent = t);
   } else if(type==='partial'){
     document.getElementById('fb-area').innerHTML = `<div class="feedback" style="background:var(--gold-light);color:#412402">Good try! Let's look at it from a different angle. Try again.</div>`;
   } else if(type==='wrong'){
@@ -1396,6 +1448,11 @@ Never say the student is jumping ahead. Stay within Catholic classical content. 
     const reply = data.content?.find(b=>b.type==='text')?.text || "Good try! Let's keep going.";
     lastQuestion = extractLastQuestion(reply) || lastQuestion;
     fbArea.innerHTML = `<div class="feedback" style="background:var(--blue-light);color:#042C53;line-height:1.7">${reply}</div>`;
+    // Also update right panel question box with new question
+    const newQs = reply.match(/[^.!?]*\?[^?]*/g) || [];
+    if(newQs.length){
+      document.getElementById('ai-question-box').innerHTML = newQs.map(q=>`<div style="background:var(--gold-light);border:1px solid #E8C870;border-radius:6px;padding:7px 9px;margin-bottom:6px;font-size:12px;color:var(--ink);">${q.trim()}</div>`).join('');
+    }
     safeReadAloud(reply);
   } catch(e){
     fbArea.innerHTML = `<div class="feedback" style="background:var(--parch2);color:var(--ink2)">Connection error. Please check your internet and try again.</div>`;
