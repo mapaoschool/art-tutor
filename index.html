@@ -15,6 +15,7 @@
   --green:#2E6614;--green-light:#E6F2DF;
   --purple:#4A3490;--purple-light:#EAE8F8;
   --teal:#126655;--teal-light:#DDF0EB;
+  --subj-bg:var(--parch);
   --radius:12px;--radius-sm:7px;
   --shadow:0 2px 12px rgba(0,0,0,0.08);
 }
@@ -57,16 +58,45 @@ body{font-family:'Georgia',serif;background:var(--parch);color:var(--ink);min-he
 .subj-progress-fill{height:100%;border-radius:2px;background:var(--gold);}
 
 /* ── TUTOR SCREEN ── */
-#tutor{background:var(--parch);}
-.tutor-content{flex:1;overflow-y:auto;padding:16px 18px;}
+#tutor{background:var(--subj-bg);}
+.tutor-content{flex:1;overflow-y:auto;padding:16px 18px;transition:background 0.3s;}
+
+/* ── CLASS TIMER — TOP ── */
+.class-timer-wrap{margin-bottom:13px;}
+.class-timer-bar{background:var(--parch2);border:1px solid var(--parch3);border-radius:var(--radius);padding:10px 16px;display:flex;align-items:center;gap:14px;font-family:sans-serif;}
+.class-timer-label{font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:0.07em;}
+.class-timer-display{font-size:22px;font-weight:bold;font-family:monospace;min-width:52px;}
+.class-timer-display.ok{color:var(--green);}
+.class-timer-display.warn{color:var(--gold);}
+.class-timer-display.urgent{color:var(--red);}
+.class-timer-track{flex:1;height:10px;background:var(--parch3);border-radius:5px;overflow:hidden;}
+.class-timer-fill{height:100%;border-radius:5px;transition:width 1s linear,background 0.5s;}
+.class-timer-fill.ok{background:var(--green);}
+.class-timer-fill.warn{background:var(--gold);}
+.class-timer-fill.urgent{background:var(--red);}
+.class-timer-btns{display:flex;gap:6px;}
+.ctbtn{padding:4px 10px;border-radius:14px;border:1px solid var(--parch3);background:white;color:var(--ink2);font-size:11px;cursor:pointer;font-family:sans-serif;transition:all 0.14s;}
+.ctbtn:hover{border-color:var(--gold);color:var(--gold2);}
 
 /* Session card */
 .session-card{background:var(--parch2);border:1px solid var(--parch3);border-radius:var(--radius);overflow:hidden;margin-bottom:14px;box-shadow:var(--shadow);}
 .session-header{padding:10px 14px;border-bottom:1px solid var(--parch3);display:flex;align-items:center;gap:8px;font-size:11px;font-weight:bold;color:var(--ink3);text-transform:uppercase;letter-spacing:0.07em;font-family:sans-serif;}
 .live-dot{width:8px;height:8px;border-radius:50%;background:#2E9922;flex-shrink:0;animation:pulse 2s infinite;}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
-.session-body{padding:15px;font-size:14px;line-height:1.75;color:var(--ink);min-height:100px;white-space:pre-wrap;}
+.session-body{padding:15px;font-size:14px;line-height:1.85;color:var(--ink);min-height:100px;white-space:pre-wrap;}
+/* Highlight word being read */
+.session-body .word-wrap{display:inline;}
+.session-body mark.reading-word{background:var(--gold-light);border-radius:3px;padding:0 2px;transition:background 0.1s;}
 .session-cite{padding:8px 14px;border-top:1px solid var(--parch3);font-size:11px;color:var(--ink3);font-style:italic;font-family:sans-serif;}
+
+/* Book cover image */
+.book-cover-wrap{display:flex;align-items:center;gap:13px;background:var(--parch2);border:1px solid var(--parch3);border-radius:var(--radius-sm);padding:10px 13px;margin-bottom:13px;}
+.book-cover-img{width:54px;height:74px;object-fit:cover;border-radius:4px;border:1px solid var(--parch3);background:var(--parch3);flex-shrink:0;}
+.book-cover-img.placeholder{display:flex;align-items:center;justify-content:center;font-size:28px;}
+.book-cover-info{flex:1;}
+.book-cover-title{font-size:13px;font-weight:bold;color:var(--ink);line-height:1.4;}
+.book-cover-sub{font-size:11px;color:var(--ink3);margin-top:3px;font-family:sans-serif;}
+.book-cover-link{font-size:11px;color:var(--blue);margin-top:5px;display:inline-block;}
 
 /* Book link */
 .book-link-box{background:var(--blue-light);border:1px solid #A8C8F0;border-radius:var(--radius-sm);padding:10px 13px;margin-bottom:13px;display:flex;align-items:center;gap:9px;font-size:13px;}
@@ -74,15 +104,31 @@ body{font-family:'Georgia',serif;background:var(--parch);color:var(--ink);min-he
 
 /* Read aloud bar */
 .read-bar{background:var(--gold-light);border:1px solid #E8C870;border-radius:var(--radius-sm);padding:9px 13px;margin-bottom:13px;display:flex;align-items:center;gap:10px;font-family:sans-serif;font-size:13px;}
-.read-bar-btns{display:flex;gap:7px;margin-left:auto;}
+.read-bar-btns{display:flex;gap:7px;margin-left:auto;flex-wrap:wrap;}
 .rbtn{padding:5px 12px;border-radius:20px;border:1px solid var(--gold);background:white;color:var(--gold2);font-size:12px;cursor:pointer;font-family:sans-serif;transition:all 0.14s;}
 .rbtn:hover{background:var(--gold);color:white;}
 .rbtn.playing{background:var(--gold);color:white;}
 
-/* Response area */
-.response-box{border:1px solid var(--parch3);border-radius:var(--radius);overflow:hidden;margin-bottom:13px;}
+/* ── RESPONSE AREA — now adjacent to AI card ── */
+.lesson-response-wrap{margin-bottom:13px;}
+.response-box{border:1px solid var(--parch3);border-radius:var(--radius);overflow:hidden;margin-bottom:8px;}
 .response-header{padding:8px 13px;background:var(--parch2);font-size:11px;font-weight:bold;color:var(--ink3);text-transform:uppercase;letter-spacing:0.07em;border-bottom:1px solid var(--parch3);font-family:sans-serif;}
-.response-body{padding:13px;min-height:70px;font-size:13px;line-height:1.65;color:var(--ink);}
+.response-body{padding:13px;min-height:60px;font-size:13px;line-height:1.65;color:var(--ink);}
+
+/* Student input — inside the response wrap */
+.student-input-bar{display:flex;gap:8px;align-items:flex-end;margin-bottom:8px;}
+.student-input-box{flex:1;border:1.5px solid var(--parch3);border-radius:var(--radius-sm);padding:9px 12px;font-size:14px;font-family:'Georgia',serif;color:var(--ink);background:white;resize:none;min-height:42px;max-height:120px;transition:border-color 0.15s;line-height:1.5;}
+.student-input-box:focus{outline:none;border-color:var(--gold);}
+.student-input-box::placeholder{color:var(--ink3);font-style:italic;}
+.student-send-btn{padding:9px 16px;background:var(--gold);color:white;border:none;border-radius:var(--radius-sm);font-size:13px;cursor:pointer;font-family:sans-serif;transition:all 0.15s;flex-shrink:0;height:42px;}
+.student-send-btn:hover{background:var(--gold2);}
+.student-send-btn:disabled{opacity:0.4;cursor:not-allowed;}
+.student-answer-display{background:var(--parch2);border:1px solid var(--parch3);border-radius:var(--radius-sm);padding:9px 12px;font-size:13px;color:var(--ink);margin-bottom:8px;line-height:1.6;display:none;}
+.student-answer-display strong{color:var(--gold2);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:3px;font-family:sans-serif;}
+
+/* Feedback area — inside response wrap */
+#fb-area{margin-bottom:0;}
+.feedback{padding:10px 13px;border-radius:var(--radius-sm);font-size:13px;font-family:sans-serif;line-height:1.6;}
 
 /* Hint + warn */
 .hint-warn{background:var(--red-light);border:1px solid #F0A898;border-radius:var(--radius-sm);padding:9px 13px;font-size:12px;color:var(--red);display:flex;align-items:center;gap:7px;margin-bottom:11px;font-family:sans-serif;}
@@ -95,9 +141,8 @@ body{font-family:'Georgia',serif;background:var(--parch);color:var(--ink);min-he
 .btn-gold{background:var(--gold);color:white;border-color:var(--gold);}
 .btn-gold:hover{background:var(--gold2);border-color:var(--gold2);}
 .btn:disabled{opacity:0.45;cursor:not-allowed;}
-.feedback{padding:10px 13px;border-radius:var(--radius-sm);font-size:13px;font-family:sans-serif;line-height:1.6;margin-top:10px;}
 
-/* Timer */
+/* Speed Timer (Math) */
 .timer-bar{background:var(--parch2);border:1px solid var(--parch3);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:13px;display:flex;align-items:center;gap:12px;font-family:sans-serif;}
 .timer-display{font-size:32px;font-weight:bold;color:var(--gold);font-family:monospace;min-width:50px;}
 .timer-display.urgent{color:var(--red);}
@@ -121,22 +166,10 @@ body{font-family:'Georgia',serif;background:var(--parch);color:var(--ink);min-he
 .img-card{border-radius:var(--radius-sm);overflow:hidden;border:1px solid var(--parch3);background:var(--parch2);}
 .img-card img{width:100%;height:120px;object-fit:cover;display:block;}
 .img-card-label{font-size:11px;color:var(--ink3);padding:4px 7px;font-family:sans-serif;}
-.book-page-btn{display:flex;align-items:center;gap:8px;background:var(--gold-light);border:1px solid #E8C870;border-radius:var(--radius-sm);padding:10px 13px;margin-bottom:13px;font-family:sans-serif;font-size:13px;text-decoration:none;color:var(--gold2);font-weight:bold;transition:all 0.15s;cursor:pointer;}
-.book-page-btn:hover{background:var(--accent-light);border-color:var(--gold);}
-.book-page-btn .bpb-icon{font-size:18px;flex-shrink:0;}
-.book-page-btn .bpb-text{flex:1;}
-.book-page-btn .bpb-sub{font-size:11px;color:var(--ink3);font-weight:normal;margin-top:1px;}
 .img-loading{font-size:12px;color:var(--ink3);font-family:sans-serif;padding:8px 0;}
-.student-input-bar{display:flex;gap:8px;align-items:flex-end;margin-bottom:13px;}
-.student-input-box{flex:1;border:1.5px solid var(--parch3);border-radius:var(--radius-sm);padding:9px 12px;font-size:14px;font-family:'Georgia',serif;color:var(--ink);background:white;resize:none;min-height:42px;max-height:120px;transition:border-color 0.15s;line-height:1.5;}
-.student-input-box:focus{outline:none;border-color:var(--gold);}
-.student-input-box::placeholder{color:var(--ink3);font-style:italic;}
-.student-send-btn{padding:9px 16px;background:var(--gold);color:white;border:none;border-radius:var(--radius-sm);font-size:13px;cursor:pointer;font-family:sans-serif;transition:all 0.15s;flex-shrink:0;height:42px;}
-.student-send-btn:hover{background:var(--gold2);}
-.student-send-btn:disabled{opacity:0.4;cursor:not-allowed;}
-.student-answer-display{background:var(--parch2);border:1px solid var(--parch3);border-radius:var(--radius-sm);padding:9px 12px;font-size:13px;color:var(--ink);margin-bottom:8px;line-height:1.6;display:none;}
-.student-answer-display strong{color:var(--gold2);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:3px;font-family:sans-serif;}
-.mic-bar{background:#F0EBF8;border:1px solid #C8A8E8;border-radius:var(--radius-sm);padding:9px 13px;margin-bottom:13px;display:flex;align-items:center;gap:10px;font-family:sans-serif;font-size:13px;}
+
+/* Mic */
+.mic-bar{background:#F0EBF8;border:1px solid #C8A8E8;border-radius:var(--radius-sm);padding:9px 13px;margin-bottom:8px;display:flex;align-items:center;gap:10px;font-family:sans-serif;font-size:13px;}
 .mic-btn{width:44px;height:44px;border-radius:50%;border:none;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.18s;flex-shrink:0;}
 .mic-btn.idle{background:#9B59B6;color:white;}
 .mic-btn.idle:hover{background:#7D3C98;}
@@ -147,6 +180,13 @@ body{font-family:'Georgia',serif;background:var(--parch);color:var(--ink);min-he
 .mic-transcript{background:white;border:1px solid #C8A8E8;border-radius:var(--radius-sm);padding:8px 11px;font-size:13px;color:var(--ink);min-height:36px;margin-top:8px;line-height:1.5;font-style:italic;}
 .mic-transcript:empty::before{content:'Student response will appear here...';color:var(--ink3);}
 .retry-chip{display:inline-block;font-size:11px;background:#FAEEDA;color:#633806;border-radius:10px;padding:2px 8px;margin-left:6px;font-family:sans-serif;}
+
+/* Book page ref */
+.book-page-ref{background:var(--parch2);border:1px solid var(--parch3);border-radius:var(--radius-sm);padding:9px 13px;margin-bottom:13px;font-family:sans-serif;font-size:12px;color:var(--ink3);display:flex;align-items:center;gap:8px;}
+
+/* Math diagnostic banner */
+.diag-banner{background:var(--blue-light);border:1px solid #A8C8F0;border-radius:var(--radius);padding:14px 16px;margin-bottom:13px;font-family:sans-serif;font-size:13px;color:var(--blue);}
+.diag-banner strong{display:block;margin-bottom:6px;font-size:14px;}
 
 /* Responsive */
 @media(max-width:480px){
@@ -213,7 +253,22 @@ body{font-family:'Georgia',serif;background:var(--parch);color:var(--ink);min-he
       <div class="nav-sub" id="tutor-sub"></div>
     </div>
   </div>
-  <div class="tutor-content">
+  <div class="tutor-content" id="tutor-content">
+
+    <!-- CLASS TIMER — top of screen -->
+    <div class="class-timer-wrap" id="class-timer-wrap">
+      <div class="class-timer-bar">
+        <div>
+          <div class="class-timer-label">Class time</div>
+          <div class="class-timer-display ok" id="class-timer-display">15:00</div>
+        </div>
+        <div class="class-timer-track"><div class="class-timer-fill ok" id="class-timer-fill" style="width:100%"></div></div>
+        <div class="class-timer-btns">
+          <button class="ctbtn" onclick="startClassTimer()">▶ Start</button>
+          <button class="ctbtn" onclick="resetClassTimer()">↺</button>
+        </div>
+      </div>
+    </div>
 
     <!-- Session tracker -->
     <div class="tracker" id="tracker-box">
@@ -226,17 +281,28 @@ body{font-family:'Georgia',serif;background:var(--parch);color:var(--ink);min-he
       <button class="btn btn-gold" id="btn-begin-top" onclick="beginSession()" style="width:100%;padding:14px;font-size:15px;border-radius:var(--radius);">✦ Begin Today's Lesson</button>
     </div>
 
-    <!-- Book link -->
-    <div class="book-link-box" id="book-link-box" style="display:none">
-      📖 <span id="book-link-text"></span>
+    <!-- Book cover + link -->
+    <div class="book-cover-wrap" id="book-cover-wrap" style="display:none">
+      <div class="book-cover-img placeholder" id="book-cover-img">📖</div>
+      <div class="book-cover-info">
+        <div class="book-cover-title" id="book-cover-title"></div>
+        <div class="book-cover-sub" id="book-cover-sub"></div>
+        <a class="book-cover-link" id="book-cover-link" href="#" target="_blank" style="display:none">Open book PDF ↗</a>
+      </div>
+    </div>
+
+    <!-- Math diagnostic banner (first-time only) -->
+    <div class="diag-banner" id="diag-banner" style="display:none">
+      <strong>📋 First session — Placement Test</strong>
+      This is the first Math session for this student. The tutor will begin with a short diagnostic to find the right starting level before regular lessons begin.
     </div>
 
     <!-- Read aloud bar -->
     <div class="read-bar" id="read-bar">
       🔊 <span id="read-bar-label">Read aloud</span>
-      <div class="read-bar-btns" style="flex-wrap:wrap;gap:5px;">
+      <div class="read-bar-btns">
         <button class="rbtn" id="btn-read" onclick="toggleRead()">▶ Read</button>
-        <button class="rbtn" onclick="stopRead()">■ Stop</button>
+        <button class="rbtn" id="btn-stop" onclick="stopRead()">■ Stop</button>
         <select id="voice-speed" onchange="updateSpeed()" style="font-size:11px;border:1px solid var(--gold);border-radius:4px;padding:2px 4px;background:white;font-family:sans-serif;">
           <option value="0.7">Slow</option>
           <option value="0.9" selected>Medium</option>
@@ -246,26 +312,6 @@ body{font-family:'Georgia',serif;background:var(--parch);color:var(--ink);min-he
           <option value="auto">🎙 Auto voice</option>
         </select>
       </div>
-    </div>
-
-    <!-- Microphone bar -->
-    <div class="mic-bar" id="mic-bar">
-      <button class="mic-btn idle" id="mic-btn" onclick="toggleMic()" title="Tap to speak">🎤</button>
-      <div style="flex:1">
-        <div class="mic-status" id="mic-status">Tap 🎤 to answer by speaking</div>
-        <div class="mic-transcript" id="mic-transcript"></div>
-      </div>
-      <button class="rbtn" id="mic-clear" onclick="clearTranscript()" style="display:none">✕ Clear</button>
-    </div>
-
-    <!-- Student text input -->
-    <div class="student-input-bar">
-      <textarea class="student-input-box" id="student-input" placeholder="Type your answer here..." rows="1" onkeydown="handleInputKey(event)" oninput="autoGrow(this)"></textarea>
-      <button class="student-send-btn" id="btn-send" onclick="submitTextAnswer()">Send ↑</button>
-    </div>
-    <div class="student-answer-display" id="student-answer-display">
-      <strong>Student answered:</strong>
-      <span id="student-answer-text"></span>
     </div>
 
     <!-- Speed timer (Math only) -->
@@ -281,40 +327,52 @@ body{font-family:'Georgia',serif;background:var(--parch);color:var(--ink);min-he
       </div>
     </div>
 
-    <!-- Book page button — teacher reference only -->
-    <div id="book-page-btn-wrap" style="display:none">
-      <div style="background:var(--parch2);border:1px solid var(--parch3);border-radius:var(--radius-sm);padding:9px 13px;margin-bottom:13px;font-family:sans-serif;font-size:12px;color:var(--ink3);display:flex;align-items:center;gap:8px;">
-        <span>📖</span>
-        <span style="flex:1"><strong style="color:var(--ink2)">Teacher reference:</strong> <span id="book-page-label"></span></span>
-        <a id="book-page-btn" href="#" target="_blank" style="color:var(--blue);font-size:11px;white-space:nowrap;">Open PDF ↗</a>
-      </div>
-    </div>
-
-    <!-- Web images -->
-    <div id="img-section" class="img-section" style="display:none">
-      <div class="img-section-title">🖼️ Visual support</div>
-      <div id="img-loading" class="img-loading" style="display:none"><span class="spinner"></span> Finding images...</div>
-      <div class="img-grid" id="img-grid"></div>
-    </div>
-
     <!-- AI session card -->
     <div class="session-card">
-      <div class="session-header"><span class="live-dot"></span>AI Tutor — student responds aloud or on paper</div>
-      <div class="session-body" id="ai-response">Tap "Begin Session" to start today's lesson.</div>
+      <div class="session-header"><span class="live-dot"></span>AI Tutor</div>
+      <div class="session-body" id="ai-response">Tap "Begin Lesson" to start today's session.</div>
       <div class="session-cite" id="ai-cite"></div>
     </div>
 
-    <!-- Hint warning -->
-    <div class="hint-warn" id="hint-warn" style="display:none">
-      <div class="warn-icon">!</div>
-      <span>This student has used <strong id="hint-ct">3</strong> hints in a row. Teacher check-in recommended before continuing.</span>
-    </div>
+    <!-- ── RESPONSE AREA — directly below AI card ── -->
+    <div class="lesson-response-wrap">
 
-    <!-- Response / feedback -->
-    <div class="response-box">
-      <div class="response-header">Teacher feedback</div>
-      <div class="response-body" id="response-body">Evaluate the student's response below.</div>
-    </div>
+      <!-- Hint warning -->
+      <div class="hint-warn" id="hint-warn" style="display:none">
+        <div class="warn-icon">!</div>
+        <span>This student has used <strong id="hint-ct">3</strong> hints in a row. Teacher check-in recommended.</span>
+      </div>
+
+      <!-- Microphone bar -->
+      <div class="mic-bar" id="mic-bar">
+        <button class="mic-btn idle" id="mic-btn" onclick="toggleMic()" title="Tap to speak">🎤</button>
+        <div style="flex:1">
+          <div class="mic-status" id="mic-status">Tap 🎤 to answer by speaking</div>
+          <div class="mic-transcript" id="mic-transcript"></div>
+        </div>
+        <button class="rbtn" id="mic-clear" onclick="clearTranscript()" style="display:none">✕ Clear</button>
+      </div>
+
+      <!-- Student text input -->
+      <div class="student-input-bar">
+        <textarea class="student-input-box" id="student-input" placeholder="Type your answer here..." rows="1" onkeydown="handleInputKey(event)" oninput="autoGrow(this)"></textarea>
+        <button class="student-send-btn" id="btn-send" onclick="submitTextAnswer()">Send ↑</button>
+      </div>
+      <div class="student-answer-display" id="student-answer-display">
+        <strong>Student answered:</strong>
+        <span id="student-answer-text"></span>
+      </div>
+
+      <!-- AI feedback -->
+      <div id="fb-area"></div>
+
+      <!-- Response / feedback (teacher) -->
+      <div class="response-box" style="margin-top:8px;">
+        <div class="response-header">Teacher feedback</div>
+        <div class="response-body" id="response-body">Evaluate the student's response below.</div>
+      </div>
+
+    </div><!-- end lesson-response-wrap -->
 
     <!-- Action buttons -->
     <div class="btn-row">
@@ -325,7 +383,23 @@ body{font-family:'Georgia',serif;background:var(--parch);color:var(--ink);min-he
       <button class="btn" id="btn-hint" onclick="giveHint()" disabled>Hint</button>
       <button class="btn" id="btn-next" onclick="nextQuestion()" disabled>Next →</button>
     </div>
-    <div id="fb-area"></div>
+
+    <!-- Web images -->
+    <div id="img-section" class="img-section" style="display:none">
+      <div class="img-section-title">🖼️ Visual support</div>
+      <div id="img-loading" class="img-loading" style="display:none"><span class="spinner"></span> Finding images...</div>
+      <div class="img-grid" id="img-grid"></div>
+    </div>
+
+    <!-- Book page button — teacher reference only -->
+    <div id="book-page-btn-wrap" style="display:none">
+      <div class="book-page-ref">
+        <span>📖</span>
+        <span style="flex:1"><strong style="color:var(--ink2)">Teacher reference:</strong> <span id="book-page-label"></span></span>
+        <a id="book-page-btn" href="#" target="_blank" style="color:var(--blue);font-size:11px;white-space:nowrap;">Open PDF ↗</a>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -335,78 +409,78 @@ body{font-family:'Georgia',serif;background:var(--parch);color:var(--ink);min-he
 // ══════════════════════════════════════════════
 const SUBJECTS = {
   AL:[
-    {id:'AL-aesop',    icon:'📜', name:"Aesop's Fables",       tag:'Philosophy & Reading',  color:'#4A3490',
+    {id:'AL-aesop',    icon:'📜', name:"Aesop's Fables",       tag:'Philosophy & Reading',  color:'#4A3490', bg:'#F5F3FF',
      prompt:`You are a High School Philosophy tutor using Aesop's Fables. The student (A.L., Grade 9–12) reads independently and analyzes each fable through the lens of St. Thomas Aquinas and Aristotle. Guide rigorous philosophical discussion: identify the telos, virtue demonstrated, and apply Thomistic ethics. Never reference Karl Rahner or Bernard Lonergan. Only reference: Aristotle, Augustine, Cajetan, Garrigou-Lagrange, Maritain, Gilson, Feser, MacIntyre, Anscombe. CONTENT RESTRICTIONS: No evolution, Darwinism, gender ideology, or anti-Catholic content. READING ORDER: Sequential. Ask which fable was analyzed last time, continue with the next. SOURCE LOCK: Uploaded PDF only.`,
-     book:'Aesop\'s Fables PDF',bookUrl:'https://www.dropbox.com/scl/fi/bvlaezg1e2aktk68kdkiq/BOOK-Philosophy-Aesops-Fables-PDF-new.pdf?rlkey=r70yo6x9fdlwu3k2p21sz0v8p&dl=0',cite:'Aesop\'s Fables (Augustana Collection)'},
-    {id:'AL-bible',    icon:'✝️', name:'Bible History',          tag:'Gilmour — Weekly Lesson',color:'#126655',
+     book:"Aesop's Fables PDF",bookUrl:'https://www.dropbox.com/scl/fi/bvlaezg1e2aktk68kdkiq/BOOK-Philosophy-Aesops-Fables-PDF-new.pdf?rlkey=r70yo6x9fdlwu3k2p21sz0v8p&dl=0',cite:"Aesop's Fables (Augustana Collection)"},
+    {id:'AL-bible',    icon:'✝️', name:'Bible History',          tag:'Gilmour — Weekly Lesson',color:'#126655', bg:'#EDF7F3',
      prompt:`You are a High School Bible History tutor using 'Bible History' by Richard Gilmour (1881, Benziger Brothers). Student: A.L., Grade 9–12. Rigorous theological analysis of each lesson. Student reads independently. Guide deep comprehension and connect to salvation history and Catholic Magisterium. READING ORDER: Sequential, one lesson per session. Ask which lesson they covered last time. SOURCE LOCK: Uploaded PDF only. CONTENT RESTRICTIONS: No outside theological debates, no post-Vatican II reinterpretations contrary to perennial Magisterium.`,
      book:'Bible History — Gilmour',bookUrl:'https://www.dropbox.com/scl/fi/et4t6i1qmnvdl1rz3vb31/BOOK-RELIGION-THL-100-CATHOLIC-BIBLE-I-TEXT.pdf?rlkey=07xop0s3dmk2vx99r2ocy6vt7&dl=0',cite:'Bible History, Richard Gilmour (1881)'},
-    {id:'AL-science',  icon:'🔬', name:'Natural Sciences',       tag:'Fabre — High School',    color:'#2E6614',
+    {id:'AL-science',  icon:'🔬', name:'Natural Sciences',       tag:'Fabre — High School',    color:'#2E6614', bg:'#EFF7EA',
      prompt:`You are a High School Natural Sciences tutor using 'The Story-Book of Science' by Jean-Henri Fabre. Student: A.L., Grade 9–12. Reads independently. Guide deep comprehension and connect to Catholic scientific thought (Aquinas: formal and final causes). Suggest Ottawa seasonal observation activities. READING ORDER: Sequential, one chapter per session. CONTENT RESTRICTIONS: NEVER mention evolution, Darwinism, or ecology as ideology. SOURCE LOCK: Uploaded PDF only.`,
      book:'Story-Book of Science — Fabre',bookUrl:'https://www.dropbox.com/scl/fi/swqcbzzs5qfryoka6cxhy/BOOK-CC-NN-The-Story-Book-Of-Science-by-Jean-Henri-Fabre.pdf?rlkey=lqm9qtkos7nitt2rgt6qmlgr6&dl=0',cite:'The Story-Book of Science, Jean-Henri Fabre'},
-    {id:'AL-narnia',   icon:'🦁', name:'English Literature',     tag:'Narnia — High School',   color:'#8C5C04',
+    {id:'AL-narnia',   icon:'🦁', name:'English Literature',     tag:'Narnia — High School',   color:'#8C5C04', bg:'#FDF5E8',
      prompt:`You are a High School Literature tutor for C.S. Lewis's Chronicles of Narnia (7-book year-long plan). Student: A.L., Grade 9–12. Reads independently. Guide literary analysis: themes, allegory, Christian symbolism, character development. Connect to Catholic tradition and classical literature. READING ORDER: Sequential, same chapter plan. Ask which chapter they read last time. BOOK: The Lion, the Witch and the Wardrobe first. CONTENT RESTRICTIONS: No gender ideology, no anti-Catholic content.`,
      book:'Narnia — The Lion, the Witch and the Wardrobe',bookUrl:'https://www.dropbox.com/scl/fi/lcy5aw4ckwwiet4omw931/BOOK-Literature-NARNIA-LionWitchWardrobe_CSL.pdf?rlkey=hor768lpfooghsghm7bdtiq4a&dl=0',cite:'The Chronicles of Narnia, C.S. Lewis'},
-    {id:'AL-history',  icon:'🌍', name:'World History',          tag:'Hillyer — High School',  color:'#A33020',
+    {id:'AL-history',  icon:'🌍', name:'World History',          tag:'Hillyer — High School',  color:'#A33020', bg:'#FBF0EE',
      prompt:`You are a High School History and Geography tutor using 'A Child's History of the World' by V.M. Hillyer. Student: A.L., Grade 9–12. Reads independently. Guide deep historical analysis: cause and effect, civilizations, geography, Providence in history. READING ORDER: Sequential, one chapter per session. Ask which chapter they studied last time. CONTENT RESTRICTIONS: No evolution, no ideological framing of history. SOURCE LOCK: Uploaded PDF only.`,
      book:"A Child's History of the World — Hillyer",bookUrl:'https://www.dropbox.com/scl/fi/1a54r800vr42n3czrn339/BOOK-Historia-del-Mundo-NOBIS-PACEM.pdf?rlkey=7rxu0iae7kmxi5famx1g9lhd9&dl=0',cite:"A Child's History of the World, V.M. Hillyer"},
-    {id:'AL-grammar',  icon:'📝', name:'Grammar Review',         tag:"Harvey's — Grade 9 Mastery",color:'#1A5C9A',
+    {id:'AL-grammar',  icon:'📝', name:'Grammar Review',         tag:"Harvey's — Grade 9 Mastery",color:'#1A5C9A', bg:'#EBF2FB',
      prompt:`You are a Grammar review and mastery tutor for a 9th-grader using Harvey's 'Elementary Grammar and Composition' (1880). Student: A.L. Has studied grammar before but has gaps. Begin with a short diagnostic, then target specific weak sections. Once gaps are filled, proceed through Part II. READING ORDER: After diagnostic, go to specific gap sections. Ask which section they worked on last time. SOURCE LOCK: Uploaded PDF only. CONTENT RESTRICTIONS: Classical Catholic educational tone. No modernist grammatical theories.`,
      book:"Elementary Grammar & Composition — Harvey",bookUrl:'https://www.dropbox.com/scl/fi/o1kly606cr3jvgdj0hry1/BOOK-GRAMMAR-TRV-101-Elementary-Grammar-HARVEY_ENGLISH_GRAMMAR_I.pdf?rlkey=vxhc3pl9z0hohvdeeeh40zqg6&dl=0',cite:"Elementary Grammar and Composition, Harvey (1880)"},
-    {id:'AL-art',      icon:'🎨', name:'Art & Drawing',          tag:'Augsburg — Advanced',    color:'#B8790A',
+    {id:'AL-art',      icon:'🎨', name:'Art & Drawing',          tag:'Augsburg — Advanced',    color:'#B8790A', bg:'#FDF8EE',
      prompt:`You are a High School Art tutor using Augsburg's Drawing Book I (1901) as foundational skill-builder. Student: A.L., Grade 9–12. All chapters at faster pace. Add advanced challenges for each topic: proportion, perspective, action drawing, watercolor, memory drawing. Connect to classical and Catholic art traditions (Renaissance masters). READING ORDER: All chapters sequentially at accelerated pace. Ask which chapter or topic they worked on last time. SOURCE LOCK: Uploaded PDF only. IMAGE RULE: Do NOT show web images for drawing subjects — students draw from memory and imagination only. EXCEPTION: If a lesson references an object that is obsolete, no longer in common use, or agricultural/historical (for example: a plough, a Roman oil lamp, a medieval cart, an old spinning wheel, a 19th century tool), then add this exact tag at the end of your response: [SHOW_IMAGE: describe the object here] so the app can search for a reference image. This exception exists because students cannot visualize objects they have never seen.`,
      book:'Drawing, Book I — Augsburg',bookUrl:'https://www.dropbox.com/scl/fi/0skrduk36umr5pwd4as0p/BOOK-ART-AUSBURG-DRAWING-ART-1.pdf?rlkey=ud6m99k8lcmh6m8r7d3l0cdma&dl=0',cite:"Augsburg's Drawing, Book I (1901)"},
-    {id:'AL-latin',    icon:'⛪', name:'Traditional Latin Mass',  tag:'Campion Missal — All',   color:'#4A3490',
+    {id:'AL-latin',    icon:'⛪', name:'Traditional Latin Mass',  tag:'Campion Missal — All',   color:'#4A3490', bg:'#F5F3FF',
      prompt:`You are a Traditional Latin Mass tutor using the 'Saint Edmund Campion Children's Missal' (1954 reprint, Imprimatur Cardinal Spellman). Student: A.L., Grade 9–12. Cover 3–5 pages per session. READING ORDER: Sequential through 12 chapters: Introduction | Ch1: All Dressed Up | Ch2: Two Masses in One | Ch3: Getting Ready | Ch4: Talking to God | Ch5: Listening to God | Ch6: The Password | Ch7: We Bring Gifts | Ch8: Holy of Holies | Ch9: Our Banquet | Ch10: Holy Communion | Ch11: Giving Thanks | Ch12: Last-Minute Orders. Ask which page the student ended on last time. PRE-VATICAN II only. Traditional Latin Mass vocabulary.`,
-     book:'Saint Edmund Campion Children\'s Missal',bookUrl:'',cite:"Saint Edmund Campion Children's Missal (1954)"},
-    {id:'AL-spanish',  icon:'🇲🇽', name:'Historia del Mundo',   tag:'Español — Hillyer',      color:'#126655',
+     book:"Saint Edmund Campion Children's Missal",bookUrl:'',cite:"Saint Edmund Campion Children's Missal (1954)"},
+    {id:'AL-spanish',  icon:'🇲🇽', name:'Historia del Mundo',   tag:'Español — Hillyer',      color:'#126655', bg:'#EDF7F3',
      prompt:`Eres un tutor de Historia del Mundo y Geografía en español usando 'A Child's History of the World' de V.M. Hillyer. Estudiante: A.L., Grado 9–12. IDIOMA: Español ÚNICAMENTE. Si el estudiante habla en inglés, responde amablemente en español: "Recuerda que en esta clase hablamos en español." ORDEN DE LECTURA: Secuencial, un capítulo por sesión. Pregunta qué capítulo cubrieron la última vez. RESTRICCIONES DE CONTENIDO: Sin evolución, sin ideología de género, sin contenido anti-católico.`,
      book:'Historia del Mundo — Hillyer (Español)',bookUrl:'https://www.dropbox.com/scl/fi/1a54r800vr42n3czrn339/BOOK-Historia-del-Mundo-NOBIS-PACEM.pdf?rlkey=7rxu0iae7kmxi5famx1g9lhd9&dl=0',cite:"A Child's History of the World — en Español"},
-    {id:'AL-math',     icon:'🔢', name:'Math — Speed & Mastery',   tag:'Supplementary Topics (Daily)',color:'#2E6614',isMath:true,
+    {id:'AL-math',     icon:'🔢', name:'Math — Speed & Mastery',   tag:'Supplementary Topics (Daily)',color:'#2E6614', bg:'#EFF7EA',isMath:true,
      prompt:`You are a Math tutor focused on speed and fluency for A.L. (Grade 9–12). TOPICS: 1. Addition/subtraction/multiplication/division speed drills (EVERY session) 2. Telling time (advanced: elapsed time, 24-hr) 3. Calendar (calculations, elapsed days) 4. Temperature conversions (C↔F formulas) 5. Roman numerals (reading and writing) 6. Measurements (Imperial & Metric conversions) 7. Coins and Money (Canadian — making change, percentages). SPEED STANDARD: 3-second mental target. PACING: Challenge level — word problems, real-life scenarios. DUAL SYSTEM: Ottawa, Canada. IMAGES: Always describe visual aids. PRACTICE LINKS — give when needed: ROMAN NUMERALS: https://all-about-roman-numerals.com/how-to-add-roman-numerals/ | https://ca.ixl.com/games/roman_numerals | https://www.transum.org/software/sw/starter_of_the_day/students/Roman_Numerals.asp. MEASUREMENT: https://mrnussbaum.com/measurement. MATH GAMES: https://mrnussbaum.com/games | https://www.softschools.com/math/games/ | https://www.turtlediary.com/games/math.html. MATH VIDEOS: https://www.turtlediary.com/videos/math.html.`,
      book:'Math Speed & Mastery',bookUrl:'',cite:'Math Speed & Mastery — Supplementary Topics'},
-    {id:'AL-arithmetic',icon:'🧮', name:'Arithmetic',             tag:"Ray's Primary Arithmetic — Advanced",color:'#126655',isMath:true,
+    {id:'AL-arithmetic',icon:'🧮', name:'Arithmetic',             tag:"Ray's Primary Arithmetic — Advanced",color:'#126655', bg:'#EDF7F3',isMath:true,
      prompt:`You are an Arithmetic tutor for A.L. (Grade 9–12) using Ray's Primary Arithmetic (1877) as a mastery review. Move quickly through early lessons — if A.L. already knows a concept, confirm mastery in 2-3 questions and move on. For gaps, teach thoroughly. TEACHER SUGGESTIONS (p.12): Question-and-answer method, mental arithmetic first, written second. IMAGES: Describe visual aids from the book and say "Look at the picture on your screen." PAPER EXERCISES: "Take out your paper. Write [exercise] and show your teacher." READING ORDER: Start with a diagnostic, then target gaps, then proceed sequentially. Ask which lesson was completed last time. PRACTICE LINKS: https://mrnussbaum.com/games | https://www.softschools.com/math/games/ | https://www.turtlediary.com/games/math.html | https://www.turtlediary.com/videos/math.html. CONTENT RESTRICTIONS: Classical Catholic educational tone.`,
      book:"Ray's Primary Arithmetic (1877)",bookUrl:'https://www.dropbox.com/scl/fi/d07qycd2cibk2a04cmwsv/BOOK-MATH-RAY_PRIMARY_ARITHMETIC.pdf?rlkey=vp9rizedlzvkjbnzsmdpgvnc5&dl=0',cite:"Ray's Primary Arithmetic, Joseph Ray (1877)"}
   ],
   FA:[
-    {id:'FA-aesop',    icon:'📜', name:"Aesop's Fables",       tag:'Philosophy & Reading Gr. 1–2',color:'#4A3490',
-     prompt:`You are a Philosophy and Reading Comprehension tutor. You read aloud Aesop's Fables in sequential order for F.A. (Grade 1–4) and guide reading practice, comprehension, and philosophical discussion rooted in St. Thomas Aquinas and Aristotle. TONE: Happy, warm, encouraging. Read at a pace appropriate for 1st–2nd grade. These students are trilingual (French, English, Spanish) — read clearly, pause after sentences. DAILY FLOW: 1) Confirm next fable. 2) Read aloud — tell student to listen quietly. 3) Comprehension questions. 4) Student reads aloud. 5) Philosophical reflection (virtue, moral, Aquinas). READING ORDER: Sequential. Ask which fable was read last time. SOURCE LOCK: Uploaded PDF only. CONTENT RESTRICTIONS: No evolution, Darwinism, gender ideology, anti-Catholic content.`,
+    {id:'FA-aesop',    icon:'📜', name:"Aesop's Fables",       tag:'Philosophy & Reading Gr. 1–2',color:'#4A3490', bg:'#F5F3FF',
+     prompt:`You are a Philosophy and Reading Comprehension tutor. You read aloud Aesop's Fables in sequential order for F.A. (Grade 1–4) and guide reading practice, comprehension, and philosophical discussion rooted in St. Thomas Aquinas and Aristotle. TONE: Happy, warm, encouraging. Read at a pace appropriate for 1st–2nd grade. These students are trilingual (French, English, Spanish) — read clearly, pause after sentences. DAILY FLOW: 1) Confirm next fable. 2) Read aloud — tell student to listen quietly. 3) Comprehension questions. 4) Student reads aloud. 5) Philosophical reflection (virtue, moral, Aquinas). READING ORDER: Sequential. Ask which fable was read last time. SOURCE LOCK: Uploaded PDF only. CONTENT RESTRICTIONS: No evolution, Darwinism, gender ideology, anti-Catholic content. QUESTION RULE: After you have asked a question and the student answers correctly, move to a NEW topic or the next question — do NOT ask the same concept again "to go deeper" unless the student specifically asks. Only reteach if the student answered INCORRECTLY.`,
      book:"Aesop's Fables PDF",bookUrl:'https://www.dropbox.com/scl/fi/bvlaezg1e2aktk68kdkiq/BOOK-Philosophy-Aesops-Fables-PDF-new.pdf?rlkey=r70yo6x9fdlwu3k2p21sz0v8p&dl=0',cite:"Aesop's Fables (Augustana Collection)"},
-    {id:'FA-bible',    icon:'✝️', name:'Bible History',          tag:'Gilmour — Weekly',       color:'#126655',
+    {id:'FA-bible',    icon:'✝️', name:'Bible History',          tag:'Gilmour — Weekly',       color:'#126655', bg:'#EDF7F3',
      prompt:`You are a Bible History tutor using 'Bible History' by Richard Gilmour (1881, Benziger Brothers). Student: F.A., Grade 1–4. WEEKLY FLOW: 1) Ask student to get notebook. 2) Confirm lesson: "Last week we finished Lesson X. Today we study Lesson Y." 3) Read lesson aloud — student follows. 4) Ask chapter-end questions. 5) Student reads aloud. 6) Notebook tracing. READING ORDER: Sequential, one lesson per week. Start from Lesson 9: "The Call of Abraham." SOURCE LOCK: Uploaded PDF only. TONE: Warm, encouraging. CONTENT RESTRICTIONS: Stick to textbook and Catholic teaching only.`,
      book:'Bible History — Gilmour',bookUrl:'https://www.dropbox.com/scl/fi/et4t6i1qmnvdl1rz3vb31/BOOK-RELIGION-THL-100-CATHOLIC-BIBLE-I-TEXT.pdf?rlkey=07xop0s3dmk2vx99r2ocy6vt7&dl=0',cite:'Bible History, Richard Gilmour (1881)'},
-    {id:'FA-science',  icon:'🔬', name:'Natural Sciences',       tag:'Fabre — Gr. 1–2',        color:'#2E6614',
-     prompt:`You are a Natural Sciences and Reading Comprehension tutor for F.A. (Grade 1–4). Read aloud science lessons from Fabre, check comprehension, connect to Catholic scientific thought (Aquinas: God's creation, formal/final causes). Suggest Ottawa seasonal observations. READING ORDER: Sequential, one chapter per session. Ask which chapter they covered last time. CONTENT RESTRICTIONS: NEVER mention evolution, Darwinism, or ecology as ideology. TONE: Warm, encouraging, connects science to everyday observation. SOURCE LOCK: Uploaded PDF only.`,
+    {id:'FA-science',  icon:'🔬', name:'Natural Sciences',       tag:'Fabre — Gr. 1–2',        color:'#2E6614', bg:'#EFF7EA',
+     prompt:`You are a Natural Sciences and Reading Comprehension tutor for F.A. (Grade 1–4). Read aloud science lessons from Fabre, check comprehension, connect to Catholic scientific thought (Aquinas: God's creation, formal/final causes). Suggest Ottawa seasonal observations. READING ORDER: Sequential, one chapter per session. Ask which chapter they covered last time. CONTENT RESTRICTIONS: NEVER mention evolution, Darwinism, or ecology as ideology. TONE: Warm, encouraging, connects science to everyday observation. SOURCE LOCK: Uploaded PDF only. IMAGES: This subject benefits from images of insects, plants, animals, and their habitats. Always describe the main organism or habitat being discussed in brackets like [IMAGE: caterpillar on leaf] so the app can show a relevant photo.`,
      book:'Story-Book of Science — Fabre',bookUrl:'https://www.dropbox.com/scl/fi/swqcbzzs5qfryoka6cxhy/BOOK-CC-NN-The-Story-Book-Of-Science-by-Jean-Henri-Fabre.pdf?rlkey=lqm9qtkos7nitt2rgt6qmlgr6&dl=0',cite:'The Story-Book of Science, Jean-Henri Fabre'},
-    {id:'FA-cursive',  icon:'✍️', name:'Cursive Writing',        tag:'Zaner-Bloser & Palmer',  color:'#8C5C04',
+    {id:'FA-cursive',  icon:'✍️', name:'Cursive Writing',        tag:'Zaner-Bloser & Palmer',  color:'#8C5C04', bg:'#FDF8EE',
      prompt:`You are a Cursive Writing tutor for F.A. (Grade 1–4) teaching letter formation, posture, and penmanship in English and Spanish using Zaner-Bloser and Palmer cursive methods. POSTURE CHECK every session: "Sit up straight. Hold pencil between thumb and first two fingers, resting on ring finger. Tilt paper slightly." READING ORDER: Sequential through cursive exercises. Ask which letter or page they practiced last time. TONE: Patient, encouraging. Celebrate every improvement.`,
      book:'Cursive Writing Exercises',bookUrl:'',cite:'Zaner-Bloser & Palmer Cursive Methods'},
-    {id:'FA-phonics',  icon:'🔤', name:'Bilingual Phonics',      tag:'English & Spanish',      color:'#1A5C9A',
+    {id:'FA-phonics',  icon:'🔤', name:'Bilingual Phonics',      tag:'English & Spanish',      color:'#1A5C9A', bg:'#EBF2FB',
      prompt:`You are a bilingual Phonics tutor for F.A. (Grade 1–4) teaching reading and writing in English and Spanish. Students are trilingual (French, English, Spanish) — address sound confusions across all three languages kindly. SPEECH RECOGNITION TOLERANCE: Accept phonetically close answers. Up to 3 retries. "I think I heard [X] — close enough!" READING ORDER: Sequential through phonics exercises. Ask which sound or lesson they covered last time. TONE: Warm, patient, celebratory.`,
      book:'Phonics Workbook',bookUrl:'',cite:'Phonics.com Workbooks'},
-    {id:'FA-narnia',   icon:'🦁', name:'English Literature',     tag:'Narnia — Gr. 1–2',       color:'#8C5C04',
+    {id:'FA-narnia',   icon:'🦁', name:'English Literature',     tag:'Narnia — Gr. 1–2',       color:'#8C5C04', bg:'#FDF5E8',
      prompt:`You are a 2nd-grade English Literature tutor for C.S. Lewis's Narnia, starting with 'The Lion, the Witch and the Wardrobe.' Student: F.A., Grade 1–4. Read aloud at moderate pace. Guide comprehension: characters, events, Christian symbolism (age-appropriate). READING ORDER: Sequential. Ask which chapter was read last time. TONE: Enthusiastic, warm. Connect to faith gently. CONTENT RESTRICTIONS: No gender ideology, no anti-Catholic content. SOURCE LOCK: Uploaded PDF only.`,
      book:'Narnia — The Lion, the Witch and the Wardrobe',bookUrl:'https://www.dropbox.com/scl/fi/lcy5aw4ckwwiet4omw931/BOOK-Literature-NARNIA-LionWitchWardrobe_CSL.pdf?rlkey=hor768lpfooghsghm7bdtiq4a&dl=0',cite:'The Chronicles of Narnia, C.S. Lewis'},
-    {id:'FA-history',  icon:'🌍', name:'World History',          tag:"Hillyer — Gr. 1–2",      color:'#A33020',
+    {id:'FA-history',  icon:'🌍', name:'World History',          tag:"Hillyer — Gr. 1–2",      color:'#A33020', bg:'#FBF0EE',
      prompt:`You are a History and Geography tutor for F.A. (Grade 1–4) using 'A Child's History of the World' by V.M. Hillyer. Read aloud at moderate pace. Guide comprehension: key figures, events, geography. READING ORDER: Sequential, one chapter per session. Ask which chapter was read last time. TONE: Warm, storytelling style. Make history come alive. CONTENT RESTRICTIONS: No evolution, no ideological framing. SOURCE LOCK: Uploaded PDF only.`,
      book:"A Child's History of the World — Hillyer",bookUrl:'https://www.dropbox.com/scl/fi/1a54r800vr42n3czrn339/BOOK-Historia-del-Mundo-NOBIS-PACEM.pdf?rlkey=7rxu0iae7kmxi5famx1g9lhd9&dl=0',cite:"A Child's History of the World, V.M. Hillyer"},
-    {id:'FA-math',     icon:'🔢', name:'Math — Speed & Mastery',   tag:'Supplementary Topics (Daily)',color:'#2E6614',isMath:true,
-     prompt:`You are a Math tutor focused on speed and fluency for F.A. (Grade 1–4). TOPICS (priority order): 1. Addition/subtraction speed drills (EVERY session — 5-second standard, 3-second mental target) 2. Telling time (exact: "The short hand is on 3, long hand on 12. What time is it?") 3. Calendar 4. Tally marks 5. Temperature (C/F) 6. Roman numerals 7. Measurements (Imperial & Metric) 8. Coins and Money. PACING: Month 1: easy, digits only. Month 2+: increase difficulty, add word problems. Do NOT move to next topic until MASTERED. DUAL SYSTEM: Ottawa, Canada — both Metric (C, km, kg, L) and Imperial (F, miles, lbs, gallons). Be very specific and concrete in every question. IMAGES: Always describe visual aids (clock faces, thermometers, rulers, coins) so the app can show them. PRACTICE LINKS — give these to students who need extra practice: ROMAN NUMERALS: https://all-about-roman-numerals.com/how-to-add-roman-numerals/ | Games: https://www.tinytap.com/activities/g26rj/play/roman-numerals | https://ca.ixl.com/games/roman_numerals | https://www.turtlediary.com/games/roman-numerals.html | https://www.romanbaths.co.uk/know-your-numerals | https://www.transum.org/software/sw/starter_of_the_day/students/Roman_Numerals.asp. TELLING TIME: https://www.splashlearn.com/blog/how-to-teach-telling-time/ | https://mrnussbaum.com/telling-time | https://www.splashlearn.com/math/time-in-hours-games. COINS & MONEY: https://mrnussbaum.com/coins-and-money. CALENDAR: https://www.softschools.com/math/calendar/activities/calendar_game/ | https://www.mathmammoth.com/practice/calendar | https://mrnussbaum.com/calendar-math-making-calculations-based-on-the-calendar-online | https://www.abcya.com/games/calendar_word_problems | https://wordwall.net/en-us/community/math/calendar. TALLY MARKS: https://theeducatorsspinonit.com/teach-tally-marks-outdoor-math/. MEASUREMENT: https://mrnussbaum.com/measurement. GENERAL MATH GAMES: https://mrnussbaum.com/games | https://www.softschools.com/math/games/ | https://www.turtlediary.com/games/math.html. MATH VIDEOS: https://www.turtlediary.com/videos/math.html. When a student needs extra practice on any topic, say: "Here is a game/video to help you practice!" and give the relevant link.`,
+    {id:'FA-math',     icon:'🔢', name:'Math — Speed & Mastery',   tag:'Supplementary Topics (Daily)',color:'#2E6614', bg:'#EFF7EA',isMath:true,
+     prompt:`You are a Math tutor focused on speed and fluency for F.A. (Grade 1–4). TOPICS (priority order): 1. Addition/subtraction speed drills (EVERY session — 5-second standard, 3-second mental target) 2. Telling time (exact: "The short hand is on 3, long hand on 12. What time is it?") 3. Calendar 4. Tally marks 5. Temperature (C/F) 6. Roman numerals 7. Measurements (Imperial & Metric) 8. Coins and Money. PACING: Month 1: easy, digits only. Month 2+: increase difficulty, add word problems. Do NOT move to next topic until MASTERED. DUAL SYSTEM: Ottawa, Canada — both Metric (C, km, kg, L) and Imperial (F, miles, lbs, gallons). Be very specific and concrete in every question. IMAGES: Always describe visual aids (clock faces, thermometers, rulers, coins) so the app can show them. PRACTICE LINKS: https://mrnussbaum.com/games | https://www.softschools.com/math/games/ | https://www.turtlediary.com/games/math.html.`,
      book:'Math Speed & Mastery',bookUrl:'',cite:'Math Speed & Mastery — Supplementary Topics'},
-    {id:'FA-arithmetic',icon:'🧮', name:'Arithmetic',             tag:"Ray's Primary Arithmetic",color:'#126655',isMath:true,
-     prompt:`You are an Arithmetic tutor for F.A. (Grade 1–4) using Ray's Primary Arithmetic (1877) by Joseph Ray. Follow the book lesson by lesson in order. TEACHER SUGGESTIONS (from book p.12): 1) Begin with concrete objects — always show or describe real objects (balls, blocks, fingers) before abstract numbers. 2) Use the question-and-answer method — ask the student questions, never just tell them. 3) Each lesson has an explanation for the teacher AND exercises for the student — cover both every session. 4) If the student struggles, go back to objects. 5) Students should write exercises on paper and show the teacher. 6) Mental arithmetic first, then written. 7) Never move to the next lesson until the current one is mastered. IMAGES: Every lesson in Ray's has visual aids (balls, objects, number illustrations). Always describe the image from the book and say "The app will show you a picture of this." Then search for a matching web image. PAPER EXERCISES: When a lesson requires writing, say: "Now take out your paper and pencil. Write [exercise] and show it to your teacher when done." LESSON FLOW: 1) Greet student. 2) Review last lesson briefly. 3) Introduce new concept with concrete objects. 4) Ask questions — never lecture. 5) Give oral exercises. 6) Give written exercises (paper). 7) Give practice link if needed. READING ORDER: Sequential from Lesson 1. Ask which lesson they completed last time. PRACTICE LINKS — give when student needs extra practice: MEASUREMENT: https://mrnussbaum.com/measurement. MATH GAMES: https://mrnussbaum.com/games | https://www.softschools.com/math/games/ | https://www.turtlediary.com/games/math.html. MATH VIDEOS: https://www.turtlediary.com/videos/math.html. ROMAN NUMERALS: https://all-about-roman-numerals.com/how-to-add-roman-numerals/ | https://www.tinytap.com/activities/g26rj/play/roman-numerals | https://ca.ixl.com/games/roman_numerals. TELLING TIME: https://mrnussbaum.com/telling-time | https://www.splashlearn.com/math/time-in-hours-games. COINS & MONEY: https://mrnussbaum.com/coins-and-money. CONTENT RESTRICTIONS: No evolution, no gender ideology, no anti-Catholic content. Classical Catholic educational tone.`,
+    {id:'FA-arithmetic',icon:'🧮', name:'Arithmetic',             tag:"Ray's Primary Arithmetic",color:'#126655', bg:'#EDF7F3',isMath:true,
+     prompt:`You are an Arithmetic tutor for F.A. (Grade 1–4) using Ray's Primary Arithmetic (1877) by Joseph Ray. Follow the book lesson by lesson in order. TEACHER SUGGESTIONS (from book p.12): 1) Begin with concrete objects. 2) Use the question-and-answer method. 3) Mental arithmetic first, then written. 7) Never move to the next lesson until the current one is mastered. IMAGES: Every lesson in Ray's has visual aids. Always describe the image and say "The app will show you a picture of this." PAPER EXERCISES: "Now take out your paper and pencil. Write [exercise] and show it to your teacher when done." READING ORDER: Sequential from Lesson 1. Ask which lesson they completed last time. PRACTICE LINKS: https://mrnussbaum.com/games | https://www.turtlediary.com/games/math.html. CONTENT RESTRICTIONS: Classical Catholic educational tone.`,
      book:"Ray's Primary Arithmetic (1877)",bookUrl:'https://www.dropbox.com/scl/fi/d07qycd2cibk2a04cmwsv/BOOK-MATH-RAY_PRIMARY_ARITHMETIC.pdf?rlkey=vp9rizedlzvkjbnzsmdpgvnc5&dl=0',cite:"Ray's Primary Arithmetic, Joseph Ray (1877)"},
-    {id:'FA-grammar',  icon:'📝', name:'Elementary Grammar',     tag:"Harvey's — First Introduction",color:'#1A5C9A',
+    {id:'FA-grammar',  icon:'📝', name:'Elementary Grammar',     tag:"Harvey's — First Introduction",color:'#1A5C9A', bg:'#EBF2FB',
      prompt:`You are an Elementary Grammar tutor for F.A. (Grade 1–4) using Harvey's 'Elementary Grammar and Composition' (1880). This is the student's FIRST introduction to grammar. Assume NO prior knowledge. READING ORDER: The Senses → Definition of Object → Definition of Word → Language → The Sentence → Sentence-Making → Quotation Marks → Parts of Speech → The Noun. Ask which section they covered last time. TONE: Very warm, patient, concrete examples always. One concept per session. SOURCE LOCK: Uploaded PDF only.`,
      book:"Elementary Grammar & Composition — Harvey",bookUrl:'https://www.dropbox.com/scl/fi/o1kly606cr3jvgdj0hry1/BOOK-GRAMMAR-TRV-101-Elementary-Grammar-HARVEY_ENGLISH_GRAMMAR_I.pdf?rlkey=vxhc3pl9z0hohvdeeeh40zqg6&dl=0',cite:"Elementary Grammar and Composition, Harvey (1880)"},
-    {id:'FA-art',      icon:'🎨', name:'Art & Drawing',          tag:'Augsburg — Gr. 1–2',     color:'#B8790A',
+    {id:'FA-art',      icon:'🎨', name:'Art & Drawing',          tag:'Augsburg — Gr. 1–2',     color:'#B8790A', bg:'#FDF8EE',
      prompt:`You are an Art and Drawing tutor for F.A. (Grade 1–4) using Augsburg's Drawing Book I (1901). Read aloud each chapter introduction. Guide drawing from memory and imagination — never from copying. One chapter per session. RETEACH MODES: Visual (show/demonstrate), Verbal (describe and discuss), Kinetic (physical activity first). Never give the answer directly. Always cite the book. READING ORDER: Sequential through all chapters. Ask which chapter or drawing topic they worked on last time. IMAGE RULE: Do NOT show web images for drawing subjects — students draw from memory and imagination only. EXCEPTION: If a lesson references an object that is obsolete, no longer in common use, or agricultural/historical (for example: a plough, a Roman oil lamp, a medieval cart, a 19th century tool), then add this exact tag at the end of your response: [SHOW_IMAGE: describe the object here] so the app can find a reference image for the student.`,
      book:'Drawing, Book I — Augsburg',bookUrl:'https://www.dropbox.com/scl/fi/0skrduk36umr5pwd4as0p/BOOK-ART-AUSBURG-DRAWING-ART-1.pdf?rlkey=ud6m99k8lcmh6m8r7d3l0cdma&dl=0',cite:"Augsburg's Drawing, Book I (1901)"},
-    {id:'FA-latin',    icon:'⛪', name:'Latin Mass',             tag:'Campion Missal',          color:'#4A3490',
+    {id:'FA-latin',    icon:'⛪', name:'Latin Mass',             tag:'Campion Missal',          color:'#4A3490', bg:'#F5F3FF',
      prompt:`You are a Traditional Latin Mass tutor using the 'Saint Edmund Campion Children's Missal' (1954, Imprimatur Cardinal Spellman). Student: F.A., Grade 1–4. Cover 1–2 pages per session. READING ORDER: Sequential. Ask which page the student ended on last time. PRE-VATICAN II only. Traditional Latin Mass vocabulary and prayers. TONE: Reverent, warm, encouraging.`,
      book:"Saint Edmund Campion Children's Missal",bookUrl:'',cite:"Saint Edmund Campion Children's Missal (1954)"},
-    {id:'FA-spanish',  icon:'🇲🇽', name:'Historia del Mundo',  tag:'Español — Hillyer',       color:'#126655',
+    {id:'FA-spanish',  icon:'🇲🇽', name:'Historia del Mundo',  tag:'Español — Hillyer',       color:'#126655', bg:'#EDF7F3',
      prompt:`Eres un tutor de Historia del Mundo y Geografía en español usando 'A Child's History of the World' de V.M. Hillyer. Estudiante: F.A., Grado 1–4. Lee en voz alta a un ritmo apropiado. IDIOMA: Español ÚNICAMENTE. Si el estudiante habla en inglés, responde amablemente: "Recuerda que en esta clase hablamos en español." ORDEN DE LECTURA: Secuencial, un capítulo por sesión. Pregunta qué capítulo cubrieron la última vez. RESTRICCIONES: Sin evolución, sin ideología de género, sin contenido anti-católico.`,
      book:'Historia del Mundo — Hillyer (Español)',bookUrl:'https://www.dropbox.com/scl/fi/1a54r800vr42n3czrn339/BOOK-Historia-del-Mundo-NOBIS-PACEM.pdf?rlkey=7rxu0iae7kmxi5famx1g9lhd9&dl=0',cite:"A Child's History of the World — en Español"}
   ]
@@ -416,61 +490,62 @@ SUBJECTS.FC = SUBJECTS.FA.map(s=>({...s,id:s.id.replace('FA-','FC-'),prompt:s.pr
 
 // LJ subjects — Kindergarten adapted
 SUBJECTS.LJ = [
-  {id:'LJ-aesop',   icon:'📜', name:"Aesop's Fables",      tag:'Philosophy — Kindergarten',color:'#4A3490',
-   prompt:`You are a Kindergarten Philosophy tutor for L.J. (Kindergarten, but with the logical reasoning of a Grade 3 student). Use Kindergarten-friendly, short, playful language — but the conceptual depth of Grade 3 (explain the WHY simply). Read Aesop's Fables aloud at a very slow, clear pace. One fable per session. TONE: Very warm, playful, celebratory. READING ORDER: Sequential from the first fable. Ask which fable they heard last time. CONTENT RESTRICTIONS: No evolution, gender ideology, anti-Catholic content.`,
+  {id:'LJ-aesop',   icon:'📜', name:"Aesop's Fables",      tag:'Philosophy — Kindergarten',color:'#4A3490', bg:'#F5F3FF',
+   prompt:`You are a Kindergarten Philosophy tutor for L.J. (Kindergarten, but with the logical reasoning of a Grade 3 student). Use Kindergarten-friendly, short, playful language — but the conceptual depth of Grade 3 (explain the WHY simply). Read Aesop's Fables aloud at a very slow, clear pace. One fable per session. TONE: Very warm, playful, celebratory. READING ORDER: Sequential from the first fable. Ask which fable they heard last time. CONTENT RESTRICTIONS: No evolution, gender ideology, anti-Catholic content. QUESTION RULE: After a student answers correctly, move on — do NOT ask the same concept again "to go deeper."`,
    book:"Aesop's Fables PDF",bookUrl:'https://www.dropbox.com/scl/fi/bvlaezg1e2aktk68kdkiq/BOOK-Philosophy-Aesops-Fables-PDF-new.pdf?rlkey=r70yo6x9fdlwu3k2p21sz0v8p&dl=0',cite:"Aesop's Fables"},
-  {id:'LJ-bible',   icon:'✝️', name:'Bible History',         tag:'Gilmour — Kindergarten',  color:'#126655',
+  {id:'LJ-bible',   icon:'✝️', name:'Bible History',         tag:'Gilmour — Kindergarten',  color:'#126655', bg:'#EDF7F3',
    prompt:`You are a Kindergarten Bible History tutor for L.J. (Kindergarten, logic of Grade 3). Use very simple, short sentences. Read slowly. Lots of encouragement. One lesson per week from Gilmour. READING ORDER: Sequential. Ask which lesson they covered last time. CONTENT RESTRICTIONS: Catholic teaching only. TONE: Very warm and gentle.`,
    book:'Bible History — Gilmour',bookUrl:'https://www.dropbox.com/scl/fi/et4t6i1qmnvdl1rz3vb31/BOOK-RELIGION-THL-100-CATHOLIC-BIBLE-I-TEXT.pdf?rlkey=07xop0s3dmk2vx99r2ocy6vt7&dl=0',cite:'Bible History, Richard Gilmour (1881)'},
-  {id:'LJ-science', icon:'🔬', name:'Natural Sciences',      tag:'Fabre — Kindergarten',    color:'#2E6614',
-   prompt:`You are a Kindergarten Natural Sciences tutor for L.J. (Kindergarten, logic of Grade 3). Very simple language, short sentences. Read Fabre slowly. Connect to things L.J. can see around him (Ottawa seasons, animals, plants). CONTENT RESTRICTIONS: NEVER mention evolution or Darwinism. READING ORDER: Sequential. Ask which chapter they covered last time.`,
+  {id:'LJ-science', icon:'🔬', name:'Natural Sciences',      tag:'Fabre — Kindergarten',    color:'#2E6614', bg:'#EFF7EA',
+   prompt:`You are a Kindergarten Natural Sciences tutor for L.J. (Kindergarten, logic of Grade 3). Very simple language, short sentences. Read Fabre slowly. Connect to things L.J. can see around him (Ottawa seasons, animals, plants). CONTENT RESTRICTIONS: NEVER mention evolution or Darwinism. READING ORDER: Sequential. Ask which chapter they covered last time. IMAGES: Always describe the main insect, plant, or animal in brackets like [IMAGE: butterfly wings] so the app can show a photo.`,
    book:'Story-Book of Science — Fabre',bookUrl:'https://www.dropbox.com/scl/fi/swqcbzzs5qfryoka6cxhy/BOOK-CC-NN-The-Story-Book-Of-Science-by-Jean-Henri-Fabre.pdf?rlkey=lqm9qtkos7nitt2rgt6qmlgr6&dl=0',cite:'The Story-Book of Science, Jean-Henri Fabre'},
-  {id:'LJ-narnia',  icon:'🦁', name:'English Literature',    tag:'Narnia — Kindergarten',   color:'#8C5C04',
+  {id:'LJ-narnia',  icon:'🦁', name:'English Literature',    tag:'Narnia — Kindergarten',   color:'#8C5C04', bg:'#FDF5E8',
    prompt:`You are a Kindergarten Literature tutor for L.J. (Kindergarten, logic of Grade 3) reading Narnia. Read very slowly and clearly. Ask simple comprehension questions: "Who did we meet? What happened?" Connect to faith gently and simply. READING ORDER: Sequential. Ask what happened in the last session, then continue from the next part.`,
    book:'Narnia — The Lion, the Witch and the Wardrobe',bookUrl:'https://www.dropbox.com/scl/fi/lcy5aw4ckwwiet4omw931/BOOK-Literature-NARNIA-LionWitchWardrobe_CSL.pdf?rlkey=hor768lpfooghsghm7bdtiq4a&dl=0',cite:'The Chronicles of Narnia, C.S. Lewis'},
-  {id:'LJ-history', icon:'🌍', name:'World History',         tag:'Hillyer — Kindergarten',  color:'#A33020',
+  {id:'LJ-history', icon:'🌍', name:'World History',         tag:'Hillyer — Kindergarten',  color:'#A33020', bg:'#FBF0EE',
    prompt:`You are a Kindergarten History tutor for L.J. (Kindergarten, logic of Grade 3) using Hillyer. Read aloud slowly. Make it a story. Simple questions. READING ORDER: Sequential. Ask which chapter they covered last time. CONTENT RESTRICTIONS: No evolution, no ideology.`,
    book:"A Child's History of the World — Hillyer",bookUrl:'https://www.dropbox.com/scl/fi/1a54r800vr42n3czrn339/BOOK-Historia-del-Mundo-NOBIS-PACEM.pdf?rlkey=7rxu0iae7kmxi5famx1g9lhd9&dl=0',cite:"A Child's History of the World, V.M. Hillyer"},
-  {id:'LJ-grammar', icon:'📝', name:'Grammar Introduction',  tag:"Harvey's — Kindergarten", color:'#1A5C9A',
+  {id:'LJ-grammar', icon:'📝', name:'Grammar Introduction',  tag:"Harvey's — Kindergarten", color:'#1A5C9A', bg:'#EBF2FB',
    prompt:`You are a Kindergarten Grammar tutor for L.J. (Kindergarten, logic of Grade 3) using Harvey (1880). ONLY cover: The Senses (naming objects), Definition of Object, Definition of Word. Spend MULTIPLE sessions per concept. Do NOT go beyond The Sentence until very comfortable. Use games, pointing at objects in the room, simple repetition. TONE: Extremely playful and patient.`,
    book:"Elementary Grammar & Composition — Harvey",bookUrl:'https://www.dropbox.com/scl/fi/o1kly606cr3jvgdj0hry1/BOOK-GRAMMAR-TRV-101-Elementary-Grammar-HARVEY_ENGLISH_GRAMMAR_I.pdf?rlkey=vxhc3pl9z0hohvdeeeh40zqg6&dl=0',cite:"Elementary Grammar and Composition, Harvey (1880)"},
-  {id:'LJ-art',     icon:'🎨', name:'Art & Drawing',         tag:'Augsburg — Kindergarten', color:'#B8790A',
+  {id:'LJ-art',     icon:'🎨', name:'Art & Drawing',         tag:'Augsburg — Kindergarten', color:'#B8790A', bg:'#FDF8EE',
    prompt:`You are a Kindergarten Art tutor for L.J. (Kindergarten, logic of Grade 3) using Augsburg (1901). Start with Mental Image (drawing from memory), then First Years, then Chapter I. Spend many sessions on each. Jump to Color chapter anytime for variety. Use Kindergarten-friendly, playful language (short, fun, encouraging) but explain the concept clearly since L.J. is a strong logical thinker. Ask what they drew last time. RETEACH: Visual → Verbal → Kinetic (physical activity first for this age). IMAGE RULE: Do NOT show web images for drawing subjects — students draw from memory and imagination only. EXCEPTION: If a lesson references an object that is obsolete, no longer in common use, or agricultural/historical (for example: a plough, an old cart, a 19th century tool), add this exact tag at the end of your response: [SHOW_IMAGE: describe the object here] so the app can find a reference image.`,
    book:'Drawing, Book I — Augsburg',bookUrl:'https://www.dropbox.com/scl/fi/0skrduk36umr5pwd4as0p/BOOK-ART-AUSBURG-DRAWING-ART-1.pdf?rlkey=ud6m99k8lcmh6m8r7d3l0cdma&dl=0',cite:"Augsburg's Drawing, Book I (1901)"},
-  {id:'LJ-latin',   icon:'⛪', name:'Latin Mass',            tag:'Campion Missal — Kinder', color:'#4A3490',
+  {id:'LJ-latin',   icon:'⛪', name:'Latin Mass',            tag:'Campion Missal — Kinder', color:'#4A3490', bg:'#F5F3FF',
    prompt:`You are a Traditional Latin Mass tutor for L.J. (Kindergarten) using the 'Saint Edmund Campion Children's Missal' (1954). Cover 1–2 pages per session. Very slow, very simple. Lots of pictures and descriptions. READING ORDER: Sequential. Ask which page they ended on last time. PRE-VATICAN II. TONE: Reverent and warm.`,
    book:"Saint Edmund Campion Children's Missal",bookUrl:'',cite:"Saint Edmund Campion Children's Missal (1954)"},
-  {id:'LJ-spanish', icon:'🇲🇽', name:'Historia del Mundo',  tag:'Español — Kindergarten',  color:'#126655',
+  {id:'LJ-spanish', icon:'🇲🇽', name:'Historia del Mundo',  tag:'Español — Kindergarten',  color:'#126655', bg:'#EDF7F3',
    prompt:`Eres un tutor de Historia del Mundo en español para L.J. (Kindergarten, lógica de 3er grado). Lee muy despacio y claramente. Frases cortas y simples. IDIOMA: Español ÚNICAMENTE. ORDEN DE LECTURA: Secuencial. Pregunta qué capítulo cubrieron la última vez. RESTRICCIONES: Sin evolución, sin ideología de género, sin contenido anti-católico.`,
    book:'Historia del Mundo — Hillyer (Español)',bookUrl:'https://www.dropbox.com/scl/fi/1a54r800vr42n3czrn339/BOOK-Historia-del-Mundo-NOBIS-PACEM.pdf?rlkey=7rxu0iae7kmxi5famx1g9lhd9&dl=0',cite:"A Child's History of the World — en Español"},
-  {id:'LJ-math',     icon:'🔢', name:'Math — Speed & Mastery',   tag:'Supplementary Topics (Daily)',color:'#2E6614',isMath:true,
-   prompt:`You are a Math tutor focused on speed and fluency for L.J. (Kindergarten, logic of Grade 3). Use very short, playful, simple language. TOPICS (priority order): 1. Addition/subtraction speed drills (EVERY session — 5-second standard) 2. Telling time (simple: hour and half-hour only) 3. Calendar (days, months) 4. Tally marks 5. Temperature (C/F — simple: hot/cold/warm) 6. Coins and Money (Canadian). PACING: Very slow. One concept at a time. Lots of celebration. IMAGES: Always describe visual aids so the app can show them. PRACTICE LINKS — give to student when needed: TELLING TIME: https://mrnussbaum.com/telling-time | https://www.splashlearn.com/math/time-in-hours-games. COINS & MONEY: https://mrnussbaum.com/coins-and-money. CALENDAR: https://www.softschools.com/math/calendar/activities/calendar_game/ | https://mrnussbaum.com/calendar-math-making-calculations-based-on-the-calendar-online. TALLY MARKS: https://theeducatorsspinonit.com/teach-tally-marks-outdoor-math/. MATH GAMES: https://mrnussbaum.com/games | https://www.turtlediary.com/games/math.html. MATH VIDEOS: https://www.turtlediary.com/videos/math.html.`,
+  {id:'LJ-math',     icon:'🔢', name:'Math — Speed & Mastery',   tag:'Supplementary Topics (Daily)',color:'#2E6614', bg:'#EFF7EA',isMath:true,
+   prompt:`You are a Math tutor focused on speed and fluency for L.J. (Kindergarten, logic of Grade 3). Use very short, playful, simple language. TOPICS (priority order): 1. Addition/subtraction speed drills (EVERY session — 5-second standard) 2. Telling time (simple: hour and half-hour only) 3. Calendar (days, months) 4. Tally marks 5. Temperature (C/F — simple: hot/cold/warm) 6. Coins and Money (Canadian). PACING: Very slow. One concept at a time. Lots of celebration. IMAGES: Always describe visual aids so the app can show them. PRACTICE LINKS: https://mrnussbaum.com/telling-time | https://mrnussbaum.com/coins-and-money | https://mrnussbaum.com/games.`,
    book:'Math Speed & Mastery',bookUrl:'',cite:'Math Speed & Mastery — Supplementary Topics'},
-  {id:'LJ-arithmetic',icon:'🧮', name:'Arithmetic',             tag:"Ray's Primary Arithmetic — Kinder",color:'#126655',isMath:true,
-   prompt:`You are an Arithmetic tutor for L.J. (Kindergarten, logic of Grade 3) using Ray's Primary Arithmetic (1877). Use very short, playful, Kindergarten-friendly sentences — but the conceptual depth of Grade 3 (explain the WHY simply). Always start with concrete objects. TEACHER SUGGESTIONS (p.12): 1) Always use real objects first (balls, fingers, blocks). 2) Question-and-answer method only — never just tell. 3) Mental arithmetic first, then written. 4) Never move on until mastered. IMAGES: Every lesson has visual aids. Describe them and say "Look at the picture on your screen!" PAPER EXERCISES: When writing is needed, say: "Take out your paper and pencil! Write [exercise] and show it to your teacher." READING ORDER: Sequential from Lesson 1. Ask which lesson was completed last time. PRACTICE LINKS: https://mrnussbaum.com/games | https://www.turtlediary.com/games/math.html | https://www.turtlediary.com/videos/math.html. TONE: Very warm, playful, celebratory. Lots of encouragement!`,
+  {id:'LJ-arithmetic',icon:'🧮', name:'Arithmetic',             tag:"Ray's Primary Arithmetic — Kinder",color:'#126655', bg:'#EDF7F3',isMath:true,
+   prompt:`You are an Arithmetic tutor for L.J. (Kindergarten, logic of Grade 3) using Ray's Primary Arithmetic (1877). Use very short, playful, Kindergarten-friendly sentences — but the conceptual depth of Grade 3 (explain the WHY simply). Always start with concrete objects. TEACHER SUGGESTIONS (p.12): 1) Always use real objects first (balls, fingers, blocks). 2) Question-and-answer method only — never just tell. 3) Mental arithmetic first, then written. 4) Never move on until mastered. IMAGES: Every lesson has visual aids. Describe them and say "Look at the picture on your screen!" PAPER EXERCISES: When writing is needed, say: "Take out your paper and pencil! Write [exercise] and show it to your teacher." READING ORDER: Sequential from Lesson 1. Ask which lesson was completed last time. PRACTICE LINKS: https://mrnussbaum.com/games | https://www.turtlediary.com/games/math.html. TONE: Very warm, playful, celebratory.`,
    book:"Ray's Primary Arithmetic (1877)",bookUrl:'https://www.dropbox.com/scl/fi/d07qycd2cibk2a04cmwsv/BOOK-MATH-RAY_PRIMARY_ARITHMETIC.pdf?rlkey=vp9rizedlzvkjbnzsmdpgvnc5&dl=0',cite:"Ray's Primary Arithmetic, Joseph Ray (1877)"}
 ];
 
 // ══════════════════════════════════════════════
-// UNIVERSAL RULES (injected into every prompt)
+// UNIVERSAL RULES
 // ══════════════════════════════════════════════
 const UNIVERSAL_RULES = `
 UNIVERSAL RULES (apply to every subject):
 1. SESSION TRACKING: At the start of every session, confirm with the student which lesson/chapter/fable they completed last time. Never repeat unless student requests review.
-2. SESSION LENGTH: All subjects: 15 minutes maximum. Literature: up to 25 minutes, but end the session as soon as the student finishes reading and answering questions — do not fill remaining time. Summarize and preview next lesson at end.
-3. CONTENT RESTRICTIONS: NEVER discuss gender ideology, sex education, DEI ideology, evolution, Darwinism, ecology (as ideology), vulgarity, critical race theory, or anti-Catholic content. Redirect gently: "That's not something we cover. Let's get back to our lesson!"
+2. SESSION LENGTH: Maximum 15 minutes for all subjects; up to 25 minutes for Literature. End the session as soon as the student has finished the reading and answered all questions — do NOT fill remaining time with extra activities or new topics. Summarize what was covered and preview the next session, then close.
+3. CONTENT RESTRICTIONS: NEVER discuss gender ideology, sex education, DEI ideology, evolution, Darwinism, ecology (as ideology), vulgarity, critical race theory, or anti-Catholic content. Redirect gently.
 4. ADAPTIVE TEACHING: If struggling, present concept in a DIFFERENT way (analogy, story, visual). Do not repeat the same explanation.
 5. VISUAL SUPPORT: Generate images when needed. If unable, say: "Ask your teacher to show you a picture of [X]."
 6. FRIENDLY CORRECTIONS: Always kind and encouraging. "Great try! Let me help you…"
-7. SPEECH RECOGNITION TOLERANCE: Accept phonetically close mic answers. 3 retries max. "I think I heard [X] — close enough!"
+7. SPEECH RECOGNITION TOLERANCE: Accept phonetically close mic answers. 3 retries max.
 8. GRADING: After each session provide assessment: "Today: Lesson 12 — Reading: Good. Vocabulary: Needs review."
 9. TEACHER AUTHORITY: Give instructions, not choices. Tell the student what to do.
 10. READ-ALOUD RULE: "I am going to read. Listen carefully. Do not talk while I read. When I stop, it's your turn."
 11. CLASSICAL CATHOLIC TEACHING ONLY: All content must come from classical Catholic tradition — PRE-Second Vatican Council (pre-1962).
 12. CLICKABLE LINKS: When a lesson requires external resource, include the full URL. Wait for student to confirm before continuing.
 13. UNKNOWN TITLE RULE: If the student gives a title you don't recognize, ask them to read the first sentence or describe the characters. Always trust the uploaded PDF over training memory.
-14. WAIT FOR ANSWER: After asking any question, STOP and wait for the student to respond. Do NOT move to the next question, topic, or step until the student has given an answer. One question at a time. Silence is not an answer — wait.
-15. RETEACH AND ASK AGAIN: If the student does not know the answer, says "I don't know," or gives an incorrect response: (1) Explain the concept clearly in a DIFFERENT way (analogy, story, or visual). (2) Then ask the SAME question again. Do not move on until the student answers correctly or has made a genuine attempt after the reteach.
+14. WAIT FOR ANSWER: After asking any question, STOP and wait for the student to respond. One question at a time.
+15. RETEACH AND ASK AGAIN: If the student does not know the answer: (1) Explain differently. (2) Ask the SAME question again. Do not move on until the student answers correctly.
+16. NO REPETITIVE QUESTIONS: After a student answers a question correctly, move to the NEXT question or topic. Do NOT ask the same concept again "to go deeper" or "explore further" — only reteach if the student answered incorrectly.
 `;
 
 // ══════════════════════════════════════════════
@@ -491,10 +566,20 @@ let speechUtterance = null;
 let timerInterval = null;
 let timerSeconds = 5;
 let isReading = false;
-let lastQuestion = ''; // tracks the most recent question asked by the bot
+let readingStopped = false; // FIX: track explicit stop so chunks don't restart
+let lastQuestion = '';
+
+// Class timer state
+let classTimerInterval = null;
+let classTimerSeconds = 0;
+let classTimerTotal = 15 * 60;
+
+// Word highlight state
+let highlightWords = [];
+let currentWordIndex = 0;
 
 // ══════════════════════════════════════════════
-// STORAGE (Firebase-free: localStorage keyed by student+subject)
+// STORAGE
 // ══════════════════════════════════════════════
 function storageKey(student, subjectId){ return `mapao_${student}_${subjectId}`; }
 function getSession(student, subjectId){
@@ -503,6 +588,41 @@ function getSession(student, subjectId){
 }
 function saveSession(student, subjectId, data){
   try{ localStorage.setItem(storageKey(student,subjectId), JSON.stringify(data)); } catch(e){}
+}
+
+// ══════════════════════════════════════════════
+// CLASS TIMER
+// ══════════════════════════════════════════════
+function startClassTimer(){
+  if(classTimerInterval) return;
+  classTimerTotal = curSubject && ['narnia','aesop','bible','history','science'].some(k=>curSubject.id.includes(k)) ? 25*60 : 15*60;
+  classTimerSeconds = classTimerTotal;
+  updateClassTimerDisplay();
+  classTimerInterval = setInterval(()=>{
+    classTimerSeconds--;
+    if(classTimerSeconds <= 0){ classTimerSeconds=0; clearInterval(classTimerInterval); classTimerInterval=null; }
+    updateClassTimerDisplay();
+  }, 1000);
+}
+function resetClassTimer(){
+  clearInterval(classTimerInterval); classTimerInterval=null;
+  classTimerTotal = curSubject && ['narnia','aesop','bible','history','science'].some(k=>curSubject.id.includes(k)) ? 25*60 : 15*60;
+  classTimerSeconds = classTimerTotal;
+  updateClassTimerDisplay();
+}
+function updateClassTimerDisplay(){
+  const d = document.getElementById('class-timer-display');
+  const f = document.getElementById('class-timer-fill');
+  if(!d||!f) return;
+  const mins = Math.floor(classTimerSeconds/60);
+  const secs = classTimerSeconds % 60;
+  d.textContent = `${mins}:${secs.toString().padStart(2,'0')}`;
+  const pct = (classTimerSeconds / classTimerTotal) * 100;
+  f.style.width = pct + '%';
+  // Color: green→gold→red
+  const state = pct > 50 ? 'ok' : pct > 20 ? 'warn' : 'urgent';
+  d.className = 'class-timer-display ' + state;
+  f.className = 'class-timer-fill ' + state;
 }
 
 // ══════════════════════════════════════════════
@@ -521,7 +641,7 @@ function selectStudent(id){
   renderSubjects(id);
   showScreen('subjects');
 }
-function goHome(){ stopRead(); showScreen('home'); }
+function goHome(){ stopRead(); clearInterval(classTimerInterval); classTimerInterval=null; showScreen('home'); }
 function goSubjects(){ stopRead(); showScreen('subjects'); }
 
 function renderSubjects(studentId){
@@ -550,23 +670,33 @@ function openSubject(subjectId){
   sessionHints = 0;
   lastQuestion = '';
   stopRead();
+  clearInterval(classTimerInterval); classTimerInterval = null;
 
   document.getElementById('tutor-title').textContent = curSubject.name;
   document.getElementById('tutor-sub').textContent = curSubject.tag;
 
-  // Book link
-  const blBox = document.getElementById('book-link-box');
-  if(curSubject.bookUrl){
-    blBox.style.display='flex';
-    document.getElementById('book-link-text').innerHTML = `Open your book: <a href="${curSubject.bookUrl}" target="_blank">${curSubject.book} ↗</a>`;
+  // Per-subject background color
+  const tc = document.getElementById('tutor-content');
+  tc.style.background = curSubject.bg || 'var(--parch)';
+
+  // Reset class timer
+  classTimerTotal = ['narnia','aesop','bible','history','science'].some(k=>curSubject.id.includes(k)) ? 25*60 : 15*60;
+  classTimerSeconds = classTimerTotal;
+  updateClassTimerDisplay();
+
+  // Book cover
+  showBookCover();
+
+  // Math timer + diagnostic banner
+  document.getElementById('timer-bar').style.display = curSubject.isMath ? 'flex' : 'none';
+  if(curSubject.isMath){
+    const sess = getSession(curStudent, subjectId);
+    document.getElementById('diag-banner').style.display = sess.sessionCount === 0 ? 'block' : 'none';
   } else {
-    blBox.style.display='none';
+    document.getElementById('diag-banner').style.display = 'none';
   }
 
-  // Math timer
-  document.getElementById('timer-bar').style.display = curSubject.isMath ? 'flex' : 'none';
-
-  // Update voice picker label to show auto-assigned voice
+  // Update voice picker label
   updateVoiceLabel();
 
   // Session tracker
@@ -575,7 +705,7 @@ function openSubject(subjectId){
     `Last session: ${sess.lastLesson} · Sessions completed: ${sess.sessionCount}`;
 
   // Reset UI
-  document.getElementById('ai-response').textContent = 'Tap "Begin Session" to start today\'s lesson.';
+  document.getElementById('ai-response').textContent = 'Tap "Begin Lesson" to start today\'s session.';
   document.getElementById('ai-cite').textContent = '';
   document.getElementById('response-body').textContent = 'Evaluate the student\'s response below.';
   document.getElementById('fb-area').innerHTML = '';
@@ -591,6 +721,53 @@ function openSubject(subjectId){
   document.getElementById('btn-begin').disabled = false;
   document.getElementById('btn-begin-top').disabled = false;
   showScreen('tutor');
+}
+
+// ══════════════════════════════════════════════
+// BOOK COVER
+// ══════════════════════════════════════════════
+function showBookCover(){
+  if(!curSubject) return;
+  const wrap = document.getElementById('book-cover-wrap');
+  const img = document.getElementById('book-cover-img');
+  const title = document.getElementById('book-cover-title');
+  const sub = document.getElementById('book-cover-sub');
+  const link = document.getElementById('book-cover-link');
+
+  wrap.style.display = 'flex';
+  title.textContent = curSubject.book || curSubject.name;
+  sub.textContent = curSubject.cite || '';
+
+  if(curSubject.bookUrl){
+    link.href = curSubject.bookUrl;
+    link.style.display = 'inline-block';
+  } else {
+    link.style.display = 'none';
+  }
+
+  // Use subject icon as placeholder, try to load a Wikimedia book cover
+  img.className = 'book-cover-img placeholder';
+  img.textContent = curSubject.icon;
+
+  // Try Wikipedia/Wikimedia for a book/subject image
+  const searchQuery = curSubject.book.replace(/—.*$/, '').replace(/PDF|Español/gi,'').trim();
+  fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(searchQuery)}&prop=pageimages&pithumbsize=120&format=json&origin=*`)
+    .then(r=>r.json())
+    .then(d=>{
+      const pages = d.query?.pages;
+      if(!pages) return;
+      for(const p of Object.values(pages)){
+        if(p.thumbnail?.source){
+          const el = document.createElement('img');
+          el.src = p.thumbnail.source;
+          el.alt = searchQuery;
+          el.className = 'book-cover-img';
+          el.onerror = ()=>{}; // keep placeholder on error
+          img.replaceWith(el);
+          break;
+        }
+      }
+    }).catch(()=>{});
 }
 
 // ══════════════════════════════════════════════
@@ -610,13 +787,20 @@ async function beginSession(){
   const studentNames = {AL:'A.L. (Grade 9–12)',FA:'F.A. (Grade 1–4)',FC:'F.C. (Grade 1–4)',LJ:'L.J. (Kindergarten, logic Grade 3)'};
 
   const isNarnia = curSubject && curSubject.id.includes('narnia');
+  const isMathFirst = curSubject && curSubject.isMath && sess.sessionCount === 0;
+
   const lessonInstruction = isNarnia
     ? `4. RETELL the chapter in your own words, as a warm storyteller — vivid, engaging, age-appropriate, covering all key events, characters, and details. The student is listening and has no other way to follow the story.`
     : `4. READ the lesson or chapter content aloud in full — this is a public domain text and the student is listening. Include all key content, do not skip or summarize. The student has no other way to access the text.`;
 
+  const mathDiagInstruction = isMathFirst ? `
+FIRST SESSION — PLACEMENT TEST:
+This is the first Math session. Before any regular lessons, run a short diagnostic (6–8 questions) to identify the student's current level. Cover: basic addition/subtraction, multiplication, telling time, coins, calendar. After the diagnostic, summarize findings and tell the student which level you will start from.` : '';
+
   const prompt = `${UNIVERSAL_RULES}
 
 ${curSubject.prompt}
+${mathDiagInstruction}
 
 STUDENT: ${studentNames[curStudent]}
 LAST LESSON COMPLETED: ${sess.lastLesson}
@@ -627,7 +811,7 @@ Generate today's complete lesson. Structure it exactly like this:
 2. Confirm what was covered last time and what today's lesson will be
 3. Say: "I am going to ${isNarnia ? 'tell you the story' : 'read'} now. Please listen carefully."
 ${lessonInstruction}
-5. After the ${isNarnia ? 'retelling' : 'reading'}, ask 2–3 comprehension or discussion questions
+5. After the ${isNarnia ? 'retelling' : 'reading'}, ask 2–3 comprehension or discussion questions — ONE AT A TIME. Wait for answer before next question.
 6. End with encouragement and preview of next session
 
 IMPORTANT: Never give away answers. Be encouraging. Stay within content restrictions.
@@ -645,7 +829,6 @@ Respond in plain, natural tutor voice — no markdown, no bullet symbols.`;
       })
     });
     const data = await res.json();
-    // Handle API-level errors (rate limit, auth, overload etc.)
     if(data.error){
       document.getElementById('ai-response').textContent = `Error from AI: ${data.error.message || JSON.stringify(data.error)}. Please try again in a moment.`;
       btn.disabled = false; btn.innerHTML = '✦ Begin Session';
@@ -655,22 +838,21 @@ Respond in plain, natural tutor voice — no markdown, no bullet symbols.`;
     }
     const text = data.content?.find(b=>b.type==='text')?.text || 'Could not load lesson. Please check your connection and try again.';
     document.getElementById('ai-response').textContent = text;
-    // Extract the last question asked so respondToAnswer has context
     lastQuestion = extractLastQuestion(text);
     document.getElementById('ai-cite').textContent = 'Source: ' + curSubject.cite;
     ['btn-correct','btn-partial','btn-wrong','btn-hint','btn-next'].forEach(id=>{
       document.getElementById(id).disabled = false;
     });
-    // Show book page button
     showBookPageBtn();
-    // Auto fetch images
     fetchImagesForLesson(text);
-    // Auto read aloud — mobile browsers block speechSynthesis after async fetch
+    // Auto read aloud
     if(!NEEDS_GESTURE_FOR_TTS){
       readAloud(text);
     } else {
       promptTapToListen(text);
     }
+    // Hide diagnostic banner after first session begins
+    document.getElementById('diag-banner').style.display = 'none';
   } catch(e){
     document.getElementById('ai-response').textContent = 'Connection error: ' + e.message + '. Please check your internet and try again.';
   }
@@ -701,7 +883,6 @@ function promptTapToListen(text){
   }, {once: true});
 }
 
-// Use safeReadAloud everywhere after an async fetch — works on all browsers
 function safeReadAloud(text){
   if(!text) return;
   if(NEEDS_GESTURE_FOR_TTS){
@@ -712,45 +893,34 @@ function safeReadAloud(text){
 }
 
 // ══════════════════════════════════════════════
-// VOICE SYSTEM — picker + per-subject defaults
+// VOICE SYSTEM
 // ══════════════════════════════════════════════
-
-// Subject → voice profile map
-// Each entry: { lang, prefer: [...keywords in priority order], pitch, label }
 const VOICE_PROFILES = {
-  // Storytelling / warm narrative
   aesop:    { lang:'en-US', prefer:['Samantha','Karen','Moira','Fiona','Victoria','Serena','Aria','Jenny','Zira'], pitch:1.0, label:'Storyteller' },
   narnia:   { lang:'en-US', prefer:['Samantha','Karen','Moira','Fiona','Victoria','Serena','Aria','Jenny','Zira'], pitch:1.0, label:'Storyteller' },
   bible:    { lang:'en-US', prefer:['Samantha','Karen','Moira','Victoria','Serena','Aria','Jenny'],               pitch:0.95,label:'Warm narrator' },
   history:  { lang:'en-US', prefer:['Samantha','Karen','Moira','Victoria','Serena','Aria','Jenny'],               pitch:0.95,label:'Warm narrator' },
   science:  { lang:'en-US', prefer:['Samantha','Karen','Moira','Victoria','Serena','Aria','Jenny'],               pitch:0.95,label:'Warm narrator' },
-  // Warm male / reverent
   latin:    { lang:'en-US', prefer:['Daniel','Tom','Oliver','Arthur','Aaron','Rishi','Alex','Fred','Thomas'],     pitch:1.0, label:'Warm male' },
-  // Clear / instructional
   math:       { lang:'en-US', prefer:['Samantha','Karen','Aria','Jenny','Zira','Alice'],                         pitch:1.0, label:'Clear instructor' },
   arithmetic: { lang:'en-US', prefer:['Samantha','Karen','Aria','Jenny','Zira','Alice'],                         pitch:1.0, label:'Clear instructor' },
   grammar:    { lang:'en-US', prefer:['Samantha','Karen','Aria','Jenny','Zira','Alice'],                         pitch:1.0, label:'Clear instructor' },
   art:        { lang:'en-US', prefer:['Samantha','Karen','Moira','Fiona','Aria','Jenny'],                        pitch:1.0, label:'Warm instructor' },
-  // Spanish
   spanish:  { lang:'es-MX', prefer:['Paulina','Monica','Esperanza','Mónica','Angelica','Marisol','Jorge'],       pitch:1.0, label:'Spanish' },
 };
-
-// Kindergarten (LJ) gets a gentler, slightly higher pitch
 const LJ_PITCH_BOOST = 0.05;
 
 let allVoices = [];
-let manualVoiceOverride = null; // null = auto
+let manualVoiceOverride = null;
 
 function loadVoices(){
   allVoices = window.speechSynthesis.getVoices();
   if(allVoices.length) populateVoicePicker();
 }
 function ensureVoices(cb){
-  // Edge loads voices async — retry until available, then call cb
   if(allVoices.length){ cb(); return; }
   allVoices = window.speechSynthesis.getVoices();
   if(allVoices.length){ populateVoicePicker(); cb(); return; }
-  // Still empty — wait for onvoiceschanged or poll
   let attempts = 0;
   const poll = setInterval(()=>{
     allVoices = window.speechSynthesis.getVoices();
@@ -767,7 +937,6 @@ if(window.speechSynthesis){
   loadVoices();
 }
 
-// Show mic unsupported message for Firefox / DuckDuckGo (no SpeechRecognition)
 if(!HAS_SPEECH_RECOGNITION){
   const micBar = document.getElementById('mic-bar');
   if(micBar){
@@ -778,9 +947,7 @@ if(!HAS_SPEECH_RECOGNITION){
 function populateVoicePicker(){
   const sel = document.getElementById('voice-picker');
   if(!sel) return;
-  // Keep the "Auto" option, clear the rest
   while(sel.options.length > 1) sel.remove(1);
-  // Group: English then Spanish
   const enVoices = allVoices.filter(v=>v.lang.startsWith('en'));
   const esVoices = allVoices.filter(v=>v.lang.startsWith('es'));
   if(enVoices.length){
@@ -793,7 +960,6 @@ function populateVoicePicker(){
     esVoices.forEach(v=>{ const o=document.createElement('option'); o.value=v.name; o.textContent=v.name.replace(/\s*\(.*\)/,''); g.appendChild(o); });
     sel.appendChild(g);
   }
-  // Restore saved preference
   const saved = localStorage.getItem('voiceOverride');
   if(saved){ manualVoiceOverride=saved; sel.value=saved; }
 }
@@ -802,19 +968,18 @@ function onVoicePickerChange(){
   const sel = document.getElementById('voice-picker');
   manualVoiceOverride = sel.value === 'auto' ? null : sel.value;
   localStorage.setItem('voiceOverride', sel.value);
-  // Re-read current text with new voice
   const text = document.getElementById('ai-response').textContent;
-  if(text && !text.includes('Tap "Begin Session"')){ stopRead(); readAloud(text); }
+  if(text && !text.includes('Tap "Begin')){ stopRead(); readAloud(text); }
 }
 
 function updateVoiceLabel(){
   if(!curSubject) return;
   const sel = document.getElementById('voice-picker');
-  if(!sel || manualVoiceOverride) return; // don't override manual pick
+  if(!sel || manualVoiceOverride) return;
   const key = getSubjectKey();
   const profile = VOICE_PROFILES[key] || VOICE_PROFILES.aesop;
   const v = pickVoice(profile);
-  const opt = sel.options[0]; // the "Auto" option
+  const opt = sel.options[0];
   opt.textContent = v ? `🎙 Auto: ${v.name.replace(/\s*\(.*\)/,'').substring(0,18)}` : '🎙 Auto voice';
 }
 
@@ -829,27 +994,46 @@ function getSubjectKey(){
 
 function pickVoice(profile){
   if(!allVoices.length) return null;
-  // Try preferred voices in order
   for(const name of profile.prefer){
     const v = allVoices.find(v=>v.name.toLowerCase().includes(name.toLowerCase()) && v.lang.startsWith(profile.lang.split('-')[0]));
     if(v) return v;
   }
-  // Fallback: any voice matching lang
   const fallback = allVoices.find(v=>v.lang===profile.lang) || allVoices.find(v=>v.lang.startsWith(profile.lang.split('-')[0]));
   return fallback || null;
 }
 
 // ══════════════════════════════════════════════
-// READ ALOUD
+// READ ALOUD — FIXED with word highlighting & proper stop
 // ══════════════════════════════════════════════
 function readAloud(text){
   if(!window.speechSynthesis) return;
-  if(!text || text.includes('Tap "Begin Session"')) return;
+  if(!text || text.includes('Tap "Begin')) return;
   stopRead();
+  readingStopped = false;
   ensureVoices(()=>_doReadAloud(text));
 }
 
 function _doReadAloud(text){
+  if(readingStopped) return;
+
+  // Prepare word highlight spans in the session body
+  const sessionBody = document.getElementById('ai-response');
+  const words = text.split(/(\s+)/);
+  highlightWords = [];
+  let html = '';
+  let wordIdx = 0;
+  for(const part of words){
+    if(/\S/.test(part)){
+      html += `<span class="hl-word" id="hw${wordIdx}">${part.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</span>`;
+      highlightWords.push(wordIdx);
+      wordIdx++;
+    } else {
+      html += part.replace(/\n/g,'<br>');
+    }
+  }
+  sessionBody.innerHTML = html;
+  currentWordIndex = 0;
+
   const resumeHack = setInterval(()=>{
     if(!window.speechSynthesis.speaking){ clearInterval(resumeHack); return; }
     if(window.speechSynthesis.paused) window.speechSynthesis.resume();
@@ -858,7 +1042,6 @@ function _doReadAloud(text){
   const speed = parseFloat(document.getElementById('voice-speed').value);
   const isSpanish = curSubject && curSubject.id.includes('spanish');
 
-  // Determine voice
   let chosenVoice = null;
   if(manualVoiceOverride){
     chosenVoice = allVoices.find(v=>v.name===manualVoiceOverride) || null;
@@ -868,8 +1051,6 @@ function _doReadAloud(text){
     const profile = VOICE_PROFILES[key] || VOICE_PROFILES.aesop;
     chosenVoice = pickVoice(profile);
   }
-  // Linux/Chromium fallback: if no preferred voice found, use the first available
-  // voice matching the language rather than passing null (which silently fails on Linux)
   if(!chosenVoice && allVoices.length){
     const lang = isSpanish ? 'es' : 'en';
     chosenVoice = allVoices.find(v=>v.lang.startsWith(lang)) || allVoices[0];
@@ -880,40 +1061,67 @@ function _doReadAloud(text){
   let pitch = profile.pitch;
   if(curStudent === 'LJ') pitch = Math.min(pitch + LJ_PITCH_BOOST, 1.2);
 
-  // Chromium on Linux requires cancel() before the first speak() or it queues silently
   window.speechSynthesis.cancel();
 
   const chunks = splitIntoChunks(text, 200);
   let chunkIndex = 0;
 
   function speakChunk(){
-    if(chunkIndex >= chunks.length){
-      clearInterval(resumeHack);
-      isReading=false;
-      document.getElementById('btn-read').textContent='▶ Read';
-      document.getElementById('btn-read').classList.remove('playing');
-      return;
-    }
+    if(readingStopped){ clearInterval(resumeHack); finishRead(); return; }
+    if(chunkIndex >= chunks.length){ clearInterval(resumeHack); finishRead(); return; }
+
     const utt = new SpeechSynthesisUtterance(chunks[chunkIndex]);
     utt.rate = speed;
     utt.pitch = pitch;
     utt.lang = isSpanish ? 'es-MX' : 'en-US';
     if(chosenVoice) utt.voice = chosenVoice;
+
     utt.onstart = ()=>{
-      isReading=true;
-      document.getElementById('btn-read').textContent='⏸ Pause';
+      if(readingStopped){ window.speechSynthesis.cancel(); return; }
+      isReading = true;
+      document.getElementById('btn-read').textContent = '⏸ Pause';
       document.getElementById('btn-read').classList.add('playing');
     };
-    utt.onend = ()=>{ chunkIndex++; speakChunk(); };
-    utt.onerror = (e)=>{
-      if(e.error !== 'interrupted') chunkIndex++;
-      speakChunk();
+
+    // Word boundary highlighting + autoscroll
+    utt.onboundary = (e)=>{
+      if(e.name !== 'word') return;
+      // Clear previous highlight
+      document.querySelectorAll('.hl-word.reading-word').forEach(el=>el.classList.remove('reading-word'));
+      const el = document.getElementById('hw' + currentWordIndex);
+      if(el){
+        el.classList.add('reading-word');
+        // Autoscroll so highlighted word is visible
+        el.scrollIntoView({behavior:'smooth', block:'nearest'});
+        currentWordIndex++;
+      }
     };
+
+    utt.onend = ()=>{
+      if(readingStopped){ clearInterval(resumeHack); finishRead(); return; }
+      chunkIndex++;
+      setTimeout(speakChunk, 50);
+    };
+
+    utt.onerror = (e)=>{
+      if(readingStopped){ clearInterval(resumeHack); finishRead(); return; }
+      if(e.error !== 'interrupted') chunkIndex++;
+      setTimeout(speakChunk, 50);
+    };
+
     speechUtterance = utt;
     window.speechSynthesis.speak(utt);
   }
-  // Small delay after cancel() so Chromium Linux clears its queue before speaking
+
   setTimeout(speakChunk, 100);
+}
+
+function finishRead(){
+  isReading = false;
+  // Remove all highlights
+  document.querySelectorAll('.hl-word.reading-word').forEach(el=>el.classList.remove('reading-word'));
+  const btn = document.getElementById('btn-read');
+  if(btn){ btn.textContent='▶ Read'; btn.classList.remove('playing'); }
 }
 
 function splitIntoChunks(text, maxWords){
@@ -931,29 +1139,32 @@ function splitIntoChunks(text, maxWords){
   if(current.trim()) chunks.push(current.trim());
   return chunks.length ? chunks : [text];
 }
+
 function toggleRead(){
   const text = document.getElementById('ai-response').textContent;
-  if(!text || text.includes('Tap "Begin Session"')) return;
+  if(!text || text.includes('Tap "Begin')) return;
   if(window.speechSynthesis.speaking && !window.speechSynthesis.paused){
     window.speechSynthesis.pause();
-    document.getElementById('btn-read').textContent='▶ Resume';
+    document.getElementById('btn-read').textContent = '▶ Resume';
     document.getElementById('btn-read').classList.remove('playing');
-    isReading=false;
+    isReading = false;
   } else if(window.speechSynthesis.paused){
     window.speechSynthesis.resume();
-    document.getElementById('btn-read').textContent='⏸ Pause';
+    document.getElementById('btn-read').textContent = '⏸ Pause';
     document.getElementById('btn-read').classList.add('playing');
-    isReading=true;
+    isReading = true;
   } else {
     readAloud(text);
   }
 }
+
+// FIX: Stop now sets readingStopped flag so chunks don't restart
 function stopRead(){
+  readingStopped = true;
   if(window.speechSynthesis) window.speechSynthesis.cancel();
-  document.getElementById('btn-read').textContent='▶ Read';
-  document.getElementById('btn-read').classList.remove('playing');
-  isReading=false;
+  finishRead();
 }
+
 function updateSpeed(){
   if(window.speechSynthesis.speaking){ stopRead(); readAloud(document.getElementById('ai-response').textContent); }
 }
@@ -1001,7 +1212,7 @@ function markResponse(type){
 }
 
 // ══════════════════════════════════════════════
-// RETEACH (AI) — triggered by Reteach button or "I don't know"
+// RETEACH (AI)
 // ══════════════════════════════════════════════
 async function reteachConcept(){
   const btn = document.getElementById('btn-wrong');
@@ -1023,7 +1234,7 @@ async function reteachConcept(){
       })
     });
     const data = await res.json();
-    const text = data.content?.find(b=>b.type==='text')?.text || "That's okay! Let's think about this differently. Try to remember what we read — what did the character do?";
+    const text = data.content?.find(b=>b.type==='text')?.text || "That's okay! Let's think about this differently.";
     fbArea.innerHTML = `<div class="feedback" style="background:var(--red-light);color:#5A0000;border:1px solid #F0A898"><strong>📖 Let me explain it another way:</strong><br><br>${text}</div>`;
     safeReadAloud(text);
   } catch(e){
@@ -1084,18 +1295,18 @@ async function nextQuestion(){
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
         model:'claude-sonnet-4-5',max_tokens:600,
-        messages:[{role:'user',content:`${UNIVERSAL_RULES}\n${curSubject.prompt}\nSTUDENT: ${studentNames[curStudent]}\nContinue the session with the next question or activity. Be specific, cite the source, never give away the answer. Subject: ${curSubject.name}.`}]
+        messages:[{role:'user',content:`${UNIVERSAL_RULES}\n${curSubject.prompt}\nSTUDENT: ${studentNames[curStudent]}\nContinue the session with the NEXT question or activity. Ask a DIFFERENT question from any already asked this session. Be specific, cite the source, never give away the answer. Subject: ${curSubject.name}.`}]
       })
     });
     const data = await res.json();
     const text = data.content?.find(b=>b.type==='text')?.text||'Could not generate next question.';
     document.getElementById('ai-response').textContent=text;
+    lastQuestion = extractLastQuestion(text);
     fetchImagesForLesson(text);
     readAloud(text);
   } catch(e){ document.getElementById('ai-response').textContent='Connection error. Please try again.'; }
   btn.disabled=false; btn.innerHTML='Next →';
 }
-
 
 // ══════════════════════════════════════════════
 // STUDENT TEXT INPUT
@@ -1106,7 +1317,6 @@ function autoGrow(el) {
 }
 
 function handleInputKey(e) {
-  // Send on Enter (not Shift+Enter)
   if (e.key === 'Enter' && !e.shiftKey) {
     e.preventDefault();
     submitTextAnswer();
@@ -1118,29 +1328,24 @@ function submitTextAnswer() {
   const text = input.value.trim();
   if (!text) return;
 
-  // Show the answer
   document.getElementById('student-answer-display').style.display = 'block';
   document.getElementById('student-answer-text').textContent = text;
   document.getElementById('mic-transcript').textContent = text;
   document.getElementById('mic-clear').style.display = 'block';
   document.getElementById('mic-status').textContent = '✓ Answer received';
 
-  // Clear input immediately
   input.value = '';
   input.style.height = 'auto';
 
-  // Auto-detect "I don't know" → reteach
   const idk = /\b(i don'?t know|no s[eé]|no lo s[eé]|not sure|no idea|dunno|idk|i have no idea|i'?m not sure)\b/i;
   if(idk.test(text)){
     reteachConcept();
     return;
   }
 
-  // For all other answers — send to AI to evaluate and continue the session
   respondToAnswer(text);
 }
 
-// Extracts the last question sentence from a block of text
 function extractLastQuestion(text){
   const sentences = text.match(/[^.!?]*\?/g);
   return sentences ? sentences[sentences.length - 1].trim() : '';
@@ -1180,15 +1385,15 @@ The student answered:
 Respond in this exact order — no labels, no bullet points, plain tutor voice:
 1. Evaluate the answer warmly and specifically (correct, partially correct, or gently incorrect — referring directly to the question you asked).
 2. If incorrect or partial: briefly explain the correct idea in a DIFFERENT way from the original lesson.
-3. Ask the NEXT question or give the next instruction to keep the session going.
+3. Ask the NEXT question or give the next instruction to keep the session going. Ask a DIFFERENT question — do NOT repeat the same concept.
 
-Never say the student is jumping ahead. Never say you haven't asked a question yet. The student IS answering your question. Stay within Catholic classical content. Do not start with "I".`}]
+IMPORTANT: If the student answered correctly, praise them and immediately move to a new topic or next question. Do NOT probe deeper on the same question they already answered correctly.
+Never say the student is jumping ahead. Stay within Catholic classical content. Do not start with "I".`}]
       })
     });
     const data = await res.json();
     if(data.error) throw new Error(data.error.message);
     const reply = data.content?.find(b=>b.type==='text')?.text || "Good try! Let's keep going.";
-    // Update lastQuestion from the new reply
     lastQuestion = extractLastQuestion(reply) || lastQuestion;
     fbArea.innerHTML = `<div class="feedback" style="background:var(--blue-light);color:#042C53;line-height:1.7">${reply}</div>`;
     safeReadAloud(reply);
@@ -1224,7 +1429,6 @@ function showBookPageBtn() {
 // ══════════════════════════════════════════════
 // WEB IMAGE SEARCH
 // ══════════════════════════════════════════════
-// Extract 1-3 image search keywords from lesson text using AI
 async function fetchImagesForLesson(lessonText) {
   document.getElementById('img-section').style.display = 'none';
   document.getElementById('img-grid').innerHTML = '';
@@ -1233,15 +1437,13 @@ async function fetchImagesForLesson(lessonText) {
   const isNoVisual = curSubject && ['cursive','latin'].some(s => curSubject.id.includes(s));
   if (isNoVisual) return;
 
-  // For Art: only show image if AI tagged [SHOW_IMAGE: ...] for obsolete/agricultural objects
+  // Art: only show [SHOW_IMAGE:] tagged objects
   if (isArt) {
     const tagMatch = lessonText.match(/\[SHOW_IMAGE:\s*([^\]]+)\]/i);
     if (!tagMatch) return;
-    // Search for the tagged object only
     const objectDescription = tagMatch[1].trim();
     document.getElementById('img-section').style.display = 'block';
     document.getElementById('img-loading').style.display = 'block';
-    document.getElementById('img-grid').innerHTML = '';
     const images = await searchImages([objectDescription + ' historical', objectDescription]);
     document.getElementById('img-loading').style.display = 'none';
     if (images.length > 0) {
@@ -1257,10 +1459,38 @@ async function fetchImagesForLesson(lessonText) {
     return;
   }
 
+  // Science: check for [IMAGE: ...] tags in lesson
+  const isScience = curSubject && curSubject.id.includes('science');
+  if(isScience){
+    const tagMatches = [...lessonText.matchAll(/\[IMAGE:\s*([^\]]+)\]/gi)];
+    if(tagMatches.length > 0){
+      const queries = tagMatches.slice(0,2).map(m=>m[1].trim());
+      document.getElementById('img-section').style.display = 'block';
+      document.getElementById('img-loading').style.display = 'block';
+      const images = await searchImages(queries);
+      document.getElementById('img-loading').style.display = 'none';
+      if(images.length > 0){
+        document.getElementById('img-grid').innerHTML = images.map(img => `
+          <div class="img-card">
+            <img src="${img.url}" alt="${img.label}" onerror="this.parentElement.style.display='none'" loading="lazy">
+            <div class="img-card-label">${img.label}</div>
+          </div>
+        `).join('');
+      } else {
+        document.getElementById('img-section').style.display = 'none';
+      }
+      return;
+    }
+    // If no tag, try to auto-find an image
+  }
+
+  const isArithmetic = curSubject && curSubject.id.includes('arithmetic');
+
   try {
-    // Ask AI for best image search keywords — tailored by subject
     const subjectHint = isArithmetic
       ? 'This is an arithmetic lesson from Ray\'s Primary Arithmetic (1877). Look for visual aids like counting objects, number illustrations, or concrete math objects described in the lesson.'
+      : isScience
+      ? `This is a Natural Sciences lesson about insects, plants, animals, or habitats. Find an image of the main organism or habitat described.`
       : `Subject: ${curSubject.name}. Find images that illustrate the main visual concept.`;
 
     const kwRes = await fetch('https://divine-sunset-f2ee.panicovillegas.workers.dev', {
@@ -1269,7 +1499,7 @@ async function fetchImagesForLesson(lessonText) {
       body:JSON.stringify({
         model:'claude-sonnet-4-5',
         max_tokens:100,
-        messages:[{role:'user',content:`${subjectHint} Lesson text: "${lessonText.substring(0,400)}". Extract 2 short image search queries (3-5 words each) that would show a student the key visual concept. For arithmetic/math include specific visual aids like "counting balls arithmetic", "clock face 3 oclock", "roman numeral chart", "tally marks counting", "thermometer celsius fahrenheit", "ruler inches centimeters", "coins Canadian money". Reply with ONLY a JSON array of 2 strings, no other text. Example: ["counting balls numbers 1-10","number line primary school"]`}]
+        messages:[{role:'user',content:`${subjectHint} Lesson text: "${lessonText.substring(0,400)}". Extract 2 short image search queries (3-5 words each) that would show a student the key visual concept. Reply with ONLY a JSON array of 2 strings, no other text. Example: ["counting balls numbers 1-10","number line primary school"]`}]
       })
     });
     const kwData = await kwRes.json();
@@ -1280,7 +1510,6 @@ async function fetchImagesForLesson(lessonText) {
 
     document.getElementById('img-section').style.display = 'block';
     document.getElementById('img-loading').style.display = 'block';
-    document.getElementById('img-grid').innerHTML = '';
 
     const images = await searchImages(keywords.slice(0,2));
     document.getElementById('img-loading').style.display = 'none';
@@ -1301,7 +1530,6 @@ async function fetchImagesForLesson(lessonText) {
   }
 }
 
-// Reusable image search — Wikipedia first, Unsplash fallback
 async function searchImages(keywords) {
   const images = [];
   for (const kw of keywords) {
@@ -1323,7 +1551,6 @@ async function searchImages(keywords) {
       }
     } catch(e) {}
   }
-  // Fallback: Wikimedia Commons search
   if (images.length === 0) {
     for (const kw of keywords) {
       try {
@@ -1363,11 +1590,9 @@ function initMic() {
     return false;
   }
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  const isIOS = IS_IOS;
   recognition = new SpeechRecognition();
   recognition.continuous = false;
-  // iOS doesn't reliably support interimResults — disable to prevent silent failures
-  recognition.interimResults = !isIOS;
+  recognition.interimResults = !IS_IOS;
 
   recognition.onstart = () => {
     isListening = true;
@@ -1416,7 +1641,7 @@ function initMic() {
       document.getElementById('mic-status').textContent = 'Microphone error — tap to try again.';
     }
     setMicState('idle');
-    recognition = null; // force recreate next time (required on iOS)
+    recognition = null;
   };
 
   recognition.onend = () => {
@@ -1426,7 +1651,7 @@ function initMic() {
       document.getElementById('mic-status').textContent = "Didn't catch that — tap 🎤 and try again.";
     }
     setMicState('idle');
-    recognition = null; // iOS requires fresh instance each time
+    recognition = null;
   };
 
   return true;
@@ -1452,7 +1677,6 @@ function setMicState(state) {
 }
 
 function toggleMic() {
-  // iOS requires a fresh recognition instance every time
   if (!recognition) {
     if (!initMic()) return;
   }
@@ -1476,14 +1700,6 @@ function toggleMic() {
     }
   }
 }
-
-function clearTranscript() {
-  document.getElementById('mic-transcript').textContent = '';
-  document.getElementById('mic-clear').style.display = 'none';
-  document.getElementById('mic-status').textContent = 'Tap 🎤 to answer by speaking';
-  micRetries = 0;
-}
-
 </script>
 </body>
 </html>
