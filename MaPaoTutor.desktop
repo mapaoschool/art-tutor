@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Ma Pao Tutor
+Comment=Classical Catholic Homeschool Tutor
+Exec=xdg-open https://mapaoschool.github.io/art-tutor/
+Icon=/home/student/mapao-tutor/icons/icon-192x192.png
+Terminal=false
+Categories=Education;
+StartupNotify=false
