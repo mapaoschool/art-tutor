@@ -4,6 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ma Pao's Classical Catholic Homeschool Tutor</title>
+<!-- PWA: Install as app on iPhone, Android, Windows, Linux -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#B8790A">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Ma Pao Tutor">
+<link rel="apple-touch-icon" href="icons/icon-152x152.png">
+<link rel="apple-touch-icon" sizes="192x192" href="icons/icon-192x192.png">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
@@ -102,7 +111,7 @@ body{font-family:'Georgia',serif;background:var(--parch);color:var(--ink);min-he
 .ctbtn:hover{border-color:var(--gold);color:var(--gold2);}
 
 /* MAIN BODY — three columns */
-.tutor-body{flex:1;display:grid;grid-template-columns:160px 1fr 300px;gap:0;overflow:hidden;min-height:0;}
+.tutor-body{flex:1;display:grid;grid-template-columns:160px 1fr 220px;gap:0;overflow:hidden;min-height:0;}
 
 /* LEFT SIDEBAR */
 .tutor-left{background:var(--parch2);border-right:1px solid var(--parch3);display:flex;flex-direction:column;gap:0;overflow-y:auto;padding:10px 8px;flex-shrink:0;}
@@ -184,12 +193,12 @@ body{font-family:'Georgia',serif;background:var(--parch);color:var(--ink);min-he
 .right-label{font-size:9px;font-weight:bold;color:var(--ink3);text-transform:uppercase;letter-spacing:0.08em;font-family:sans-serif;margin-bottom:5px;}
 
 /* AI questions/feedback box */
-.ai-question-box{flex:1;overflow-y:auto;padding:10px;font-size:13px;line-height:1.75;color:var(--ink);background:var(--parch);word-wrap:break-word;overflow-wrap:break-word;white-space:normal;}
+.ai-question-box{flex:1;overflow-y:auto;padding:10px;font-size:12px;line-height:1.7;color:var(--ink);background:var(--parch);}
 .ai-question-box .live-dot{width:7px;height:7px;border-radius:50%;background:#2E9922;display:inline-block;margin-right:5px;animation:pulse 2s infinite;}
 
 /* Student response display */
 .student-response-panel{border-top:2px solid var(--parch3);padding:10px;background:var(--parch2);flex-shrink:0;}
-.student-answer-display{font-size:12px;color:var(--ink);line-height:1.6;display:none;word-wrap:break-word;overflow-wrap:break-word;}
+.student-answer-display{font-size:12px;color:var(--ink);line-height:1.6;display:none;}
 .student-answer-display strong{color:var(--gold2);font-size:10px;text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:3px;font-family:sans-serif;}
 
 /* Mic in right panel */
@@ -224,15 +233,10 @@ body{font-family:'Georgia',serif;background:var(--parch);color:var(--ink);min-he
 /* Book page ref */
 .book-page-ref{background:var(--parch2);border:1px solid var(--parch3);border-radius:var(--radius-sm);padding:6px 9px;font-family:sans-serif;font-size:10px;color:var(--ink3);display:flex;align-items:center;gap:6px;margin:0 10px 6px;}
 
-/* Responsive — tablet portrait: hide left sidebar, keep right panel (mic, questions) */
-@media(max-width:900px){
-  .tutor-body{grid-template-columns:1fr 280px;}
-  .tutor-left{display:none;}
-}
-/* Responsive — phone: hide left sidebar only, right panel (mic) always visible */
-@media(max-width:520px){
-  .tutor-body{grid-template-columns:1fr 240px;}
-  .tutor-left{display:none;}
+/* Responsive — collapse to single column on small screens */
+@media(max-width:700px){
+  .tutor-body{grid-template-columns:1fr;}
+  .tutor-left,.tutor-right{display:none;}
 }
 @media(max-width:480px){
   .student-grid{grid-template-columns:1fr 1fr;}
@@ -661,15 +665,8 @@ function startClassTimer(){
   updateClassTimerDisplay();
   classTimerInterval = setInterval(()=>{
     classTimerSeconds--;
-    if(classTimerSeconds <= 0){
-      classTimerSeconds = 0;
-      clearInterval(classTimerInterval);
-      classTimerInterval = null;
-      updateClassTimerDisplay();
-      endSessionByTimer();
-    } else {
-      updateClassTimerDisplay();
-    }
+    if(classTimerSeconds <= 0){ classTimerSeconds=0; clearInterval(classTimerInterval); classTimerInterval=null; }
+    updateClassTimerDisplay();
   }, 1000);
 }
 function resetClassTimer(){
@@ -693,42 +690,7 @@ function updateClassTimerDisplay(){
 }
 
 // ══════════════════════════════════════════════
-// SESSION END BY TIMER
-// ══════════════════════════════════════════════
-function endSessionByTimer(){
-  if(!curStudent || !curSubject) return;
-
-  // Save session progress
-  const sess = getSession(curStudent, curSubject.id);
-  sess.sessionCount++;
-  sess.lastLesson = `Session ${sess.sessionCount} — ${curSubject.name}`;
-  saveSession(curStudent, curSubject.id, sess);
-
-  // Mark subject as done for today
-  try { localStorage.setItem(getDoneKey(curStudent, curSubject.id), '1'); } catch(e){}
-
-  // Stop mic, reading, queue
-  stopRead();
-  answerQueue = [];
-  isEvaluating = false;
-  if(recognition){ try{ recognition.stop(); }catch(e){} recognition = null; }
-
-  // Show end-of-session overlay message
-  const fbArea = document.getElementById('fb-area');
-  if(fbArea) fbArea.innerHTML = `<div class="feedback" style="background:var(--green-light);color:var(--green);font-size:14px;line-height:1.8;border:1px solid #A0D090;">
-    ✅ <strong>Time's up — great work today!</strong><br>
-    ${curSubject.name} is complete for today. Returning to subjects…
-  </div>`;
-
-  // Return to subject screen after 3 seconds so student sees the message
-  setTimeout(()=>{
-    goSubjects();
-    renderSubjects(curStudent); // re-render so done color shows immediately
-  }, 3000);
-}
-
-// ══════════════════════════════════════════════
-
+// NAVIGATION
 // ══════════════════════════════════════════════
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -809,9 +771,6 @@ function openSubject(subjectId){
   if(!curSubject) return;
   sessionHints = 0;
   lastQuestion = '';
-  answerQueue = [];
-  isEvaluating = false;
-  conversationHistory = [];
   stopRead();
   clearInterval(classTimerInterval); classTimerInterval = null;
 
@@ -1488,81 +1447,12 @@ function submitTextAnswer() {
     return;
   }
 
-  enqueueAnswer(text);
+  respondToAnswer(text);
 }
 
 function extractLastQuestion(text){
   const sentences = text.match(/[^.!?]*\?/g);
   return sentences ? sentences[sentences.length - 1].trim() : '';
-}
-
-// ══════════════════════════════════════════════
-// MATH ANSWER CHECKER (no AI — pure code)
-// ══════════════════════════════════════════════
-// Answer queue — ensures answers evaluated in order, none skipped
-let answerQueue = [];
-let isEvaluating = false;
-let conversationHistory = []; // full Q&A history so bot always has context
-
-function enqueueAnswer(studentAnswer){
-  answerQueue.push(studentAnswer);
-  if(!isEvaluating) processNextAnswer();
-}
-
-async function processNextAnswer(){
-  if(answerQueue.length === 0){ isEvaluating = false; return; }
-  isEvaluating = true;
-  const studentAnswer = answerQueue.shift();
-  await respondToAnswer(studentAnswer);
-  processNextAnswer();
-}
-
-function extractExpectedNumber(questionText){
-  // Tries to find the correct answer from the last question asked
-  // Handles: "What is 3 + 4?", "7 - 2 = ?", "4 × 6 =", "12 ÷ 3 ="
-  if(!questionText) return null;
-  const q = questionText.replace(/×/g,'*').replace(/÷/g,'/').replace(/x(?=\s*\d)/gi,'*');
-  // Pattern: number op number = ? or what is number op number
-  const match = q.match(/(\d+\.?\d*)\s*([\+\-\*\/])\s*(\d+\.?\d*)\s*[=\?]/);
-  if(!match) return null;
-  const a = parseFloat(match[1]), op = match[2], b = parseFloat(match[3]);
-  if(op==='+') return a+b;
-  if(op==='-') return a-b;
-  if(op==='*') return a*b;
-  if(op==='/') return b!==0 ? Math.round((a/b)*1000)/1000 : null;
-  return null;
-}
-
-function normalizeNumber(str){
-  // Convert spoken number words to digits first
-  const words = {
-    zero:0,one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,
-    eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,
-    eighteen:18,nineteen:19,twenty:20,thirty:30,forty:40,fifty:50,sixty:60,
-    seventy:70,eighty:80,ninety:90,hundred:100,cero:0,uno:1,dos:2,tres:3,cuatro:4,
-    cinco:5,seis:6,siete:7,ocho:8,nueve:9,diez:10,once:11,doce:12
-  };
-  let s = str.toLowerCase().trim();
-  // Try word match first
-  if(words.hasOwnProperty(s)) return words[s];
-  // Try compound like "twenty three" → 23
-  const parts = s.split(/\s+/);
-  if(parts.length === 2 && words.hasOwnProperty(parts[0]) && words.hasOwnProperty(parts[1])){
-    return words[parts[0]] + words[parts[1]];
-  }
-  // Fall back to extracting first number from string
-  const m = s.match(/-?\d+\.?\d*/);
-  return m ? parseFloat(m[0]) : null;
-}
-
-function checkMathAnswer(studentAnswer, questionText){
-  // Returns: 'correct' | 'wrong' | null (null = can't determine, fall through to AI)
-  if(!curSubject || !curSubject.isMath) return null;
-  const expected = extractExpectedNumber(questionText || lastQuestion);
-  if(expected === null) return null; // question isn't a simple arithmetic drill
-  const given = normalizeNumber(studentAnswer);
-  if(given === null) return null; // student typed something non-numeric
-  return Math.abs(given - expected) < 0.01 ? 'correct' : 'wrong';
 }
 
 // ══════════════════════════════════════════════
@@ -1574,6 +1464,7 @@ async function respondToAnswer(studentAnswer){
   document.getElementById('btn-send').disabled = true;
 
   const lessonText = document.getElementById('ai-response').textContent.substring(0, 600);
+  const questionContext = lastQuestion ? `\n\nThe specific question you asked the student was:\n"${lastQuestion}"` : '';
   const gradeCtx = {
     AL:'Grade 9–12 — mature, analytical, Thomistic vocabulary',
     FA:'Grade 1–4 — simple warm language, short sentences',
@@ -1581,116 +1472,44 @@ async function respondToAnswer(studentAnswer){
     LJ:'Kindergarten with Grade 3 logic — very short playful sentences'
   };
 
-  // Record this answer in conversation history so bot always has full context
-  conversationHistory.push({ role:'user', content: studentAnswer });
-
-  // For math/arithmetic: check simple drills with code first — no AI for grading
-  const mathCheck = checkMathAnswer(studentAnswer, lastQuestion);
-  if(mathCheck !== null){
-    if(mathCheck === 'correct'){
-      fbArea.innerHTML = `<div class="feedback" style="background:var(--green-light);color:var(--green);line-height:1.7">✓ That's right! Well done.</div>`;
-      await askNextMathQuestion(lessonText, gradeCtx);
-    } else {
-      const expected = extractExpectedNumber(lastQuestion);
-      fbArea.innerHTML = `<div class="feedback" style="background:var(--red-light);color:#5A0000;line-height:1.7"><span class="spinner"></span> Let me help with that...</div>`;
-      await explainMathMistake(studentAnswer, lastQuestion, expected, gradeCtx);
-    }
-    document.getElementById('btn-send').disabled = false;
-    return;
-  }
-
-  // Non-math or complex question — send full conversation history so bot remembers everything
-  const systemPrompt = `You are a tutor for a ${gradeCtx[curStudent]} student. Subject: ${curSubject ? curSubject.name : 'General'}.
-Lesson content: "${lessonText}"
-${lastQuestion ? `Your last question to the student was: "${lastQuestion}"` : ''}
-Evaluate the student's answer and continue the session. Respond in plain tutor voice — no labels, no bullet points.
-If correct: praise warmly and ask the NEXT question (different topic).
-If incorrect or partial: explain the concept differently, then ask the SAME question again.
-Stay within Catholic classical content. Do not start with "I".`;
-
-  // Build messages: system context + full Q&A history
-  const messages = [
-    { role:'user', content: systemPrompt },
-    { role:'assistant', content: 'Understood. I will evaluate and continue.' },
-    ...conversationHistory
-  ];
-
   try {
     const res = await fetch('https://divine-sunset-f2ee.panicovillegas.workers.dev',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({ model:'claude-sonnet-4-5', max_tokens:400, messages })
+      body:JSON.stringify({
+        model:'claude-sonnet-4-5', max_tokens:400,
+        messages:[{role:'user',content:`You are a tutor for a ${gradeCtx[curStudent]} student. Subject: ${curSubject.name}.
+
+The lesson content was:
+"${lessonText}"${questionContext}
+
+The student answered:
+"${studentAnswer}"
+
+Respond in this exact order — no labels, no bullet points, plain tutor voice:
+1. Evaluate the answer warmly and specifically (correct, partially correct, or gently incorrect — referring directly to the question you asked).
+2. If incorrect or partial: briefly explain the correct idea in a DIFFERENT way from the original lesson.
+3. Ask the NEXT question or give the next instruction to keep the session going. Ask a DIFFERENT question — do NOT repeat the same concept.
+
+IMPORTANT: If the student answered correctly, praise them and immediately move to a new topic or next question. Do NOT probe deeper on the same question they already answered correctly.
+Never say the student is jumping ahead. Stay within Catholic classical content. Do not start with "I".`}]
+      })
     });
     const data = await res.json();
     if(data.error) throw new Error(data.error.message);
     const reply = data.content?.find(b=>b.type==='text')?.text || "Good try! Let's keep going.";
-    // Record bot reply in history so next evaluation has full context
-    conversationHistory.push({ role:'assistant', content: reply });
     lastQuestion = extractLastQuestion(reply) || lastQuestion;
     fbArea.innerHTML = `<div class="feedback" style="background:var(--blue-light);color:#042C53;line-height:1.7">${reply}</div>`;
+    // Also update right panel question box with new question
     const newQs = reply.match(/[^.!?]*\?[^?]*/g) || [];
     if(newQs.length){
-      document.getElementById('ai-question-box').innerHTML = newQs.map(q=>`<div style="background:var(--gold-light);border:1px solid #E8C870;border-radius:6px;padding:7px 9px;margin-bottom:6px;font-size:13px;color:var(--ink);">${q.trim()}</div>`).join('');
+      document.getElementById('ai-question-box').innerHTML = newQs.map(q=>`<div style="background:var(--gold-light);border:1px solid #E8C870;border-radius:6px;padding:7px 9px;margin-bottom:6px;font-size:12px;color:var(--ink);">${q.trim()}</div>`).join('');
     }
     safeReadAloud(reply);
   } catch(e){
     fbArea.innerHTML = `<div class="feedback" style="background:var(--parch2);color:var(--ink2)">Connection error. Please check your internet and try again.</div>`;
   }
   document.getElementById('btn-send').disabled = false;
-}
-
-async function askNextMathQuestion(lessonText, gradeCtx){
-  try {
-    // Build messages with history so Claude knows what was already asked
-    const historyContext = conversationHistory.slice(-6).map(m=>`${m.role==='user'?'Student':'Tutor'}: ${m.content}`).join('\n');
-    const res = await fetch('https://divine-sunset-f2ee.panicovillegas.workers.dev',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-5', max_tokens:200,
-        messages:[{role:'user', content:`You are a Math tutor for a ${gradeCtx[curStudent]} student. Subject: ${curSubject ? curSubject.name : 'Math'}.
-Recent session exchange:\n${historyContext}
-The student just got the last answer correct.
-Give ONE very short praise sentence, then ask ONE new arithmetic drill question — different from any already asked above. Plain tutor voice, no markdown. Do not start with "I".`}]
-      })
-    });
-    const data = await res.json();
-    const reply = data.content?.find(b=>b.type==='text')?.text || '';
-    if(!reply) return;
-    conversationHistory.push({ role:'assistant', content: reply });
-    lastQuestion = extractLastQuestion(reply) || lastQuestion;
-    const fbArea = document.getElementById('fb-area');
-    fbArea.innerHTML = `<div class="feedback" style="background:var(--green-light);color:#042C53;line-height:1.7">${reply}</div>`;
-    const newQs = reply.match(/[^.!?]*\?[^?]*/g) || [];
-    if(newQs.length) document.getElementById('ai-question-box').innerHTML = newQs.map(q=>`<div style="background:var(--gold-light);border:1px solid #E8C870;border-radius:6px;padding:7px 9px;margin-bottom:6px;font-size:13px;color:var(--ink);">${q.trim()}</div>`).join('');
-    safeReadAloud(reply);
-  } catch(e){ /* silent — correct feedback already shown */ }
-}
-
-async function explainMathMistake(studentAnswer, question, expected, gradeCtx){
-  try {
-    const res = await fetch('https://divine-sunset-f2ee.panicovillegas.workers.dev',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-5', max_tokens:250,
-        messages:[{role:'user', content:`You are a Math tutor for a ${gradeCtx[curStudent]} student.
-The student was asked: "${question}"
-The correct answer is: ${expected}
-The student answered: "${studentAnswer}"
-In 2–3 short warm sentences: acknowledge the try kindly, explain WHY the correct answer is ${expected} using a simple concrete approach (counting, objects, steps), then ask the SAME question again. No markdown. Do not start with "I".`}]
-      })
-    });
-    const data = await res.json();
-    const reply = data.content?.find(b=>b.type==='text')?.text || `Not quite — the answer is ${expected}. Try again!`;
-    conversationHistory.push({ role:'assistant', content: reply });
-    const fbArea = document.getElementById('fb-area');
-    fbArea.innerHTML = `<div class="feedback" style="background:var(--red-light);color:#5A0000;border:1px solid #F0A898;line-height:1.7">${reply}</div>`;
-    safeReadAloud(reply);
-  } catch(e){
-    const fbArea = document.getElementById('fb-area');
-    fbArea.innerHTML = `<div class="feedback" style="background:var(--red-light);color:#5A0000;line-height:1.7">Not quite! The answer is ${expected}. Try again.</div>`;
-  }
 }
 
 function clearTranscript() {
@@ -1882,8 +1701,7 @@ function initMic() {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   recognition = new SpeechRecognition();
   recognition.continuous = false;
-  // For math: interim results help catch short number answers before onend fires
-  recognition.interimResults = true;
+  recognition.interimResults = !IS_IOS;
 
   recognition.onstart = () => {
     isListening = true;
@@ -1905,21 +1723,19 @@ function initMic() {
     }
     if (final) {
       micRetries = 0;
-      isListening = false;
       setMicState('idle');
       document.getElementById('mic-status').textContent = '✓ Got it!';
       const idk = /\b(i don'?t know|no s[eé]|no lo s[eé]|not sure|no idea|dunno|idk|i have no idea|i'?m not sure)\b/i;
       if(idk.test(final)){
         reteachConcept();
       } else {
-        enqueueAnswer(final);
+        respondToAnswer(final);
       }
     }
   };
 
   recognition.onerror = (event) => {
     isListening = false;
-    recognition = null; // only null on real error so it reinits fresh next time
     if (event.error === 'no-speech') {
       micRetries++;
       if (micRetries < MAX_RETRIES) {
@@ -1934,16 +1750,17 @@ function initMic() {
       document.getElementById('mic-status').textContent = 'Microphone error — tap to try again.';
     }
     setMicState('idle');
+    recognition = null;
   };
 
   recognition.onend = () => {
     isListening = false;
-    // Don't null recognition here — let toggleMic reuse or reinit as needed
     const transcript = document.getElementById('mic-transcript').textContent;
     if(!transcript){
       document.getElementById('mic-status').textContent = "Didn't catch that — tap 🎤 and try again.";
     }
     setMicState('idle');
+    recognition = null;
   };
 
   return true;
@@ -1969,28 +1786,27 @@ function setMicState(state) {
 }
 
 function toggleMic() {
+  if (!recognition) {
+    if (!initMic()) return;
+  }
   const isSpanish = curSubject && curSubject.id && curSubject.id.includes('spanish');
-  const lang = isSpanish ? 'es-MX' : 'en-US';
+  recognition.lang = isSpanish ? 'es-MX' : 'en-US';
 
   if (isListening) {
-    // Stop current session
-    if(recognition){ try{ recognition.stop(); }catch(e){} }
+    recognition.stop();
     isListening = false;
     setMicState('idle');
-    return;
-  }
-
-  // Always create a fresh recognition object for each new listen session
-  // This prevents stale state from a previous onend
-  recognition = null;
-  if (!initMic()) return;
-  recognition.lang = lang;
-
-  try {
-    recognition.start();
-  } catch(e) {
-    recognition = null;
-    document.getElementById('mic-status').textContent = 'Could not start microphone — tap to try again.';
+  } else {
+    try {
+      recognition.start();
+    } catch(e) {
+      recognition = null;
+      if(initMic()){
+        try { recognition.start(); } catch(e2) {
+          document.getElementById('mic-status').textContent = 'Could not start microphone — tap to try again.';
+        }
+      }
+    }
   }
 }
 </script>
