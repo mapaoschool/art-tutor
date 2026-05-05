@@ -314,7 +314,8 @@ body{font-family:'Georgia',serif;background:var(--parch);color:var(--ink);min-he
         <div class="topbar-timer-track"><div class="topbar-timer-fill ok" id="class-timer-fill" style="width:100%"></div></div>
       </div>
       <div class="topbar-timer-btns">
-        <button class="ctbtn" onclick="startClassTimer()">▶</button>
+        <button class="ctbtn" id="class-timer-play" onclick="startClassTimer()">▶</button>
+        <button class="ctbtn" id="class-timer-pause" onclick="pauseClassTimer()" style="display:none">⏸</button>
         <button class="ctbtn" onclick="resetClassTimer()">↺</button>
       </div>
     </div>
@@ -352,7 +353,8 @@ body{font-family:'Georgia',serif;background:var(--parch);color:var(--ink);min-he
         <div class="timer-display" id="timer-display">5.0</div>
         <div class="timer-track"><div class="timer-fill" id="timer-fill" style="width:100%"></div></div>
         <div class="timer-btns">
-          <button class="btn" onclick="startTimer()">▶</button>
+          <button class="btn" id="speed-timer-play" onclick="startTimer()">▶</button>
+          <button class="btn" id="speed-timer-pause" onclick="pauseTimer()" style="display:none">⏸</button>
           <button class="btn" onclick="resetTimer()">↺</button>
         </div>
       </div>
@@ -382,7 +384,9 @@ body{font-family:'Georgia',serif;background:var(--parch);color:var(--ink);min-he
       <div class="read-bar" id="read-bar">
         🔊
         <div class="read-bar-btns">
-          <button class="rbtn" id="btn-read" onclick="toggleRead()">▶ Read</button>
+          <button class="rbtn" id="btn-read" onclick="startReadAloud()">▶ Read</button>
+          <button class="rbtn" id="btn-pause-read" onclick="pauseReadAloud()" style="display:none">⏸ Pause</button>
+          <button class="rbtn" id="btn-resume-read" onclick="resumeReadAloud()" style="display:none">▶ Resume</button>
           <button class="rbtn" id="btn-stop" onclick="stopRead()">■ Stop</button>
           <select id="voice-speed" onchange="updateSpeed()" style="font-size:11px;border:1px solid var(--gold);border-radius:4px;padding:2px 4px;background:white;font-family:sans-serif;">
             <option value="0.7">Slow</option>
@@ -663,11 +667,21 @@ function saveSession(student, subjectId, data){
 function startClassTimer(){
   if(classTimerInterval) return;
   classTimerTotal = curSubject && curSubject.isMath ? 10*60 : 15*60;
-  classTimerSeconds = classTimerTotal;
+  if(classTimerSeconds === 0 || classTimerSeconds === classTimerTotal) classTimerSeconds = classTimerTotal;
+  const playBtn = document.getElementById('class-timer-play');
+  const pauseBtn = document.getElementById('class-timer-pause');
+  if(playBtn) playBtn.style.display = 'none';
+  if(pauseBtn) pauseBtn.style.display = '';
   updateClassTimerDisplay();
   classTimerInterval = setInterval(()=>{
     classTimerSeconds--;
-    if(classTimerSeconds <= 0){ classTimerSeconds=0; clearInterval(classTimerInterval); classTimerInterval=null; }
+    if(classTimerSeconds <= 0){
+      classTimerSeconds=0; clearInterval(classTimerInterval); classTimerInterval=null;
+      const playBtn = document.getElementById('class-timer-play');
+      const pauseBtn = document.getElementById('class-timer-pause');
+      if(playBtn) playBtn.style.display = '';
+      if(pauseBtn) pauseBtn.style.display = 'none';
+    }
     updateClassTimerDisplay();
   }, 1000);
 }
@@ -675,8 +689,20 @@ function resetClassTimer(){
   clearInterval(classTimerInterval); classTimerInterval=null;
   classTimerTotal = curSubject && curSubject.isMath ? 10*60 : 15*60;
   classTimerSeconds = classTimerTotal;
+  const playBtn = document.getElementById('class-timer-play');
+  const pauseBtn = document.getElementById('class-timer-pause');
+  if(playBtn) playBtn.style.display = '';
+  if(pauseBtn) pauseBtn.style.display = 'none';
   updateClassTimerDisplay();
 }
+function pauseClassTimer(){
+  clearInterval(classTimerInterval); classTimerInterval=null;
+  const playBtn = document.getElementById('class-timer-play');
+  const pauseBtn = document.getElementById('class-timer-pause');
+  if(playBtn) playBtn.style.display = '';
+  if(pauseBtn) pauseBtn.style.display = 'none';
+}
+
 function updateClassTimerDisplay(){
   const d = document.getElementById('class-timer-display');
   const f = document.getElementById('class-timer-fill');
@@ -1184,8 +1210,9 @@ function _doReadAloud(text){
     utt.onstart = ()=>{
       if(readingStopped){ window.speechSynthesis.cancel(); return; }
       isReading = true;
-      document.getElementById('btn-read').textContent = '⏸ Pause';
-      document.getElementById('btn-read').classList.add('playing');
+      document.getElementById('btn-read').style.display = 'none';
+      document.getElementById('btn-pause-read').style.display = '';
+      document.getElementById('btn-resume-read').style.display = 'none';
     };
 
     // Word boundary highlighting + autoscroll
@@ -1223,10 +1250,13 @@ function _doReadAloud(text){
 
 function finishRead(){
   isReading = false;
-  // Remove all highlights
   document.querySelectorAll('.hl-word.reading-word').forEach(el=>el.classList.remove('reading-word'));
-  const btn = document.getElementById('btn-read');
-  if(btn){ btn.textContent='▶ Read'; btn.classList.remove('playing'); }
+  const btnRead = document.getElementById('btn-read');
+  const btnPause = document.getElementById('btn-pause-read');
+  const btnResume = document.getElementById('btn-resume-read');
+  if(btnRead){ btnRead.style.display = ''; btnRead.classList.remove('playing'); }
+  if(btnPause) btnPause.style.display = 'none';
+  if(btnResume) btnResume.style.display = 'none';
 }
 
 function splitIntoChunks(text, maxWords){
@@ -1246,21 +1276,37 @@ function splitIntoChunks(text, maxWords){
 }
 
 function toggleRead(){
+  // legacy — route to new functions
   const text = document.getElementById('ai-response').textContent;
   if(!text || text.includes('Tap "Begin')) return;
   if(window.speechSynthesis.speaking && !window.speechSynthesis.paused){
-    window.speechSynthesis.pause();
-    document.getElementById('btn-read').textContent = '▶ Resume';
-    document.getElementById('btn-read').classList.remove('playing');
-    isReading = false;
+    pauseReadAloud();
   } else if(window.speechSynthesis.paused){
-    window.speechSynthesis.resume();
-    document.getElementById('btn-read').textContent = '⏸ Pause';
-    document.getElementById('btn-read').classList.add('playing');
-    isReading = true;
+    resumeReadAloud();
   } else {
-    readAloud(text);
+    startReadAloud();
   }
+}
+function startReadAloud(){
+  const text = document.getElementById('ai-response').textContent;
+  if(!text || text.includes('Tap "Begin')) return;
+  readAloud(text);
+}
+function pauseReadAloud(){
+  if(!window.speechSynthesis.speaking || window.speechSynthesis.paused) return;
+  window.speechSynthesis.pause();
+  isReading = false;
+  document.getElementById('btn-read').style.display = 'none';
+  document.getElementById('btn-pause-read').style.display = 'none';
+  document.getElementById('btn-resume-read').style.display = '';
+}
+function resumeReadAloud(){
+  if(!window.speechSynthesis.paused) return;
+  window.speechSynthesis.resume();
+  isReading = true;
+  document.getElementById('btn-read').style.display = 'none';
+  document.getElementById('btn-pause-read').style.display = '';
+  document.getElementById('btn-resume-read').style.display = 'none';
 }
 
 // FIX: Stop now sets readingStopped flag so chunks don't restart
@@ -1279,15 +1325,38 @@ function updateSpeed(){
 // ══════════════════════════════════════════════
 function startTimer(){
   if(timerInterval) clearInterval(timerInterval);
+  const playBtn = document.getElementById('speed-timer-play');
+  const pauseBtn = document.getElementById('speed-timer-pause');
+  if(playBtn) playBtn.style.display = 'none';
+  if(pauseBtn) pauseBtn.style.display = '';
   timerSeconds = 5;
   updateTimerDisplay();
   timerInterval = setInterval(()=>{
     timerSeconds -= 0.1;
-    if(timerSeconds <= 0){ timerSeconds=0; clearInterval(timerInterval); timerInterval=null; }
+    if(timerSeconds <= 0){
+      timerSeconds=0; clearInterval(timerInterval); timerInterval=null;
+      const playBtn = document.getElementById('speed-timer-play');
+      const pauseBtn = document.getElementById('speed-timer-pause');
+      if(playBtn) playBtn.style.display = '';
+      if(pauseBtn) pauseBtn.style.display = 'none';
+    }
     updateTimerDisplay();
   }, 100);
 }
-function resetTimer(){ clearInterval(timerInterval); timerInterval=null; timerSeconds=5; updateTimerDisplay(); }
+function resetTimer(){
+  clearInterval(timerInterval); timerInterval=null; timerSeconds=5; updateTimerDisplay();
+  const playBtn = document.getElementById('speed-timer-play');
+  const pauseBtn = document.getElementById('speed-timer-pause');
+  if(playBtn) playBtn.style.display = '';
+  if(pauseBtn) pauseBtn.style.display = 'none';
+}
+function pauseTimer(){
+  clearInterval(timerInterval); timerInterval=null;
+  const playBtn = document.getElementById('speed-timer-play');
+  const pauseBtn = document.getElementById('speed-timer-pause');
+  if(playBtn) playBtn.style.display = '';
+  if(pauseBtn) pauseBtn.style.display = 'none';
+}
 function updateTimerDisplay(){
   const d = document.getElementById('timer-display');
   const f = document.getElementById('timer-fill');
