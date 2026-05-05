@@ -103,7 +103,7 @@ body{font-family:'Georgia',serif;background:var(--parch);color:var(--ink);min-he
 .ctbtn:hover{border-color:var(--gold);color:var(--gold2);}
 
 /* MAIN BODY — three columns */
-.tutor-body{flex:1;display:grid;grid-template-columns:160px 1fr 220px;gap:0;overflow:hidden;min-height:0;}
+.tutor-body{flex:1;display:grid;grid-template-columns:155px 1fr 340px;gap:0;overflow:hidden;min-height:0;}
 
 /* LEFT SIDEBAR */
 .tutor-left{background:var(--parch2);border-right:1px solid var(--parch3);display:flex;flex-direction:column;gap:0;overflow-y:auto;padding:10px 8px;flex-shrink:0;}
@@ -195,7 +195,7 @@ body{font-family:'Georgia',serif;background:var(--parch);color:var(--ink);min-he
 .right-label{font-size:9px;font-weight:bold;color:var(--ink3);text-transform:uppercase;letter-spacing:0.08em;font-family:sans-serif;margin-bottom:5px;}
 
 /* AI questions/feedback box */
-.ai-question-box{flex:1;overflow-y:auto;padding:10px;font-size:12px;line-height:1.7;color:var(--ink);background:var(--parch);}
+.ai-question-box{flex:1;overflow-y:auto;padding:12px;font-size:14px;line-height:1.75;color:var(--ink);background:var(--parch);}
 .ai-question-box .live-dot{width:7px;height:7px;border-radius:50%;background:#2E9922;display:inline-block;margin-right:5px;animation:pulse 2s infinite;}
 
 /* Student response display */
@@ -968,8 +968,8 @@ Respond in plain, natural tutor voice — no markdown, no bullet symbols.`;
     lastQuestion = extractLastQuestion(text);
     const questions = text.match(/[^.!?]*\?[^?]*/g) || [];
     document.getElementById('ai-question-box').innerHTML = questions.length
-      ? questions.map(q=>`<div style="background:var(--gold-light);border:1px solid #E8C870;border-radius:6px;padding:7px 9px;margin-bottom:6px;font-size:12px;color:var(--ink);">${q.trim()}</div>`).join('')
-      : `<div style="font-size:12px;color:var(--ink);line-height:1.7;">${text.substring(0,300)}...</div>`;
+      ? questions.map(q=>`<div style="background:var(--gold-light);border:1px solid #E8C870;border-radius:6px;padding:10px 12px;margin-bottom:8px;font-size:14px;color:var(--ink);line-height:1.6;">${q.trim()}</div>`).join('')
+      : `<div style="font-size:14px;color:var(--ink);line-height:1.75;">${text.substring(0,300)}...</div>`;
     document.getElementById('ai-cite').textContent = 'Source: ' + curSubject.cite;
     ['btn-correct','btn-partial','btn-wrong','btn-hint','btn-next'].forEach(id=>{
       document.getElementById(id).disabled = false;
@@ -1588,7 +1588,7 @@ Never say the student is jumping ahead. Stay within Catholic classical content. 
     // Also update right panel question box with new question
     const newQs = reply.match(/[^.!?]*\?[^?]*/g) || [];
     if(newQs.length){
-      document.getElementById('ai-question-box').innerHTML = newQs.map(q=>`<div style="background:var(--gold-light);border:1px solid #E8C870;border-radius:6px;padding:7px 9px;margin-bottom:6px;font-size:12px;color:var(--ink);">${q.trim()}</div>`).join('');
+      document.getElementById('ai-question-box').innerHTML = newQs.map(q=>`<div style="background:var(--gold-light);border:1px solid #E8C870;border-radius:6px;padding:10px 12px;margin-bottom:8px;font-size:14px;color:var(--ink);line-height:1.6;">${q.trim()}</div>`).join('');
     }
     safeReadAloud(reply);
   } catch(e){
