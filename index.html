@@ -172,12 +172,22 @@ body{font-family:'Georgia',serif;background:var(--parch);color:var(--ink);min-he
 
 /* Action buttons row */
 .action-row{display:flex;gap:6px;flex-wrap:wrap;padding:8px 12px;border-top:1px solid var(--parch3);background:var(--parch2);flex-shrink:0;}
-.btn{padding:6px 12px;border-radius:var(--radius-sm);font-size:11px;cursor:pointer;border:1.5px solid var(--parch3);background:white;color:var(--ink2);transition:all 0.14s;font-family:sans-serif;}
+.btn{padding:6px 12px;border-radius:var(--radius-sm);font-size:11px;cursor:pointer;border:1.5px solid var(--parch3);background:white;color:var(--ink2);transition:all 0.14s;font-family:sans-serif;font-weight:600;}
 .btn:hover{border-color:var(--gold);color:var(--ink);background:var(--gold-light);}
 .btn-gold{background:var(--gold);color:white;border-color:var(--gold);}
 .btn-gold:hover{background:var(--gold2);border-color:var(--gold2);}
-.btn:disabled{opacity:0.45;cursor:not-allowed;}
+.btn:disabled{opacity:0.38;cursor:not-allowed;}
 .btn-row{display:flex;gap:6px;flex-wrap:wrap;}
+#btn-correct{background:#E8F5E9;color:#2E7D32;border-color:#81C784;}
+#btn-correct:hover:not(:disabled){background:#2E7D32;color:white;border-color:#2E7D32;}
+#btn-partial{background:#FFF8E1;color:#F57F17;border-color:#FFD54F;}
+#btn-partial:hover:not(:disabled){background:#F57F17;color:white;border-color:#F57F17;}
+#btn-wrong{background:#FDECEA;color:#C62828;border-color:#EF9A9A;}
+#btn-wrong:hover:not(:disabled){background:#C62828;color:white;border-color:#C62828;}
+#btn-hint{background:#E3F2FD;color:#1565C0;border-color:#90CAF9;}
+#btn-hint:hover:not(:disabled){background:#1565C0;color:white;border-color:#1565C0;}
+#btn-next{background:#F3E5F5;color:#6A1B9A;border-color:#CE93D8;}
+#btn-next:hover:not(:disabled){background:#6A1B9A;color:white;border-color:#6A1B9A;}
 
 /* RIGHT SIDEBAR — questions & responses */
 .tutor-right{border-left:1px solid var(--parch3);display:flex;flex-direction:column;overflow:hidden;background:var(--parch);}
@@ -349,7 +359,7 @@ body{font-family:'Georgia',serif;background:var(--parch);color:var(--ink);min-he
 
       <!-- Images related to lesson -->
       <div class="left-section img-section-left" id="img-section" style="display:none">
-        <div class="left-label">🖼️ Images</div>
+        <div class="left-label" id="img-section-label">🖼️ Images</div>
         <div id="img-loading" class="img-loading" style="display:none"><span class="spinner"></span> Loading...</div>
         <div class="img-grid-left" id="img-grid"></div>
       </div>
@@ -726,11 +736,12 @@ function makeSubjCard(s, studentId){
     : (dayLabel === 'Daily' ? `<span class="subj-day-badge daily-badge">Daily</span>` : '');
   const doneClass = done ? ' subj-done' : '';
   const checkIcon = done ? '✓' : '○';
-  return `<div class="subj-btn${doneClass}" onclick="openSubject('${s.id}')">
+  const cardStyle = done ? '' : `background:${s.bg};border-color:${s.color};border-left:4px solid ${s.color};`;
+  return `<div class="subj-btn${doneClass}" onclick="openSubject('${s.id}')" style="${cardStyle}">
     <div class="subj-done-toggle" onclick="toggleDone(event,'${studentId}','${s.id}')" title="${done?'Mark as not done':'Mark as done'}">${checkIcon}</div>
     <div class="subj-icon">${s.icon}</div>
     <div class="subj-info">
-      <div class="subj-name">${s.name}</div>
+      <div class="subj-name" style="${done?'':'color:'+s.color}">${s.name}</div>
       <div class="subj-tag">${s.tag}</div>
       ${dayBadge}
       <div class="subj-progress"><div class="subj-progress-fill" style="width:${pct}%;background:${done?'#6b4fa0':s.color}"></div></div>
@@ -1601,6 +1612,8 @@ async function renderBookPage(pageNum, pdfUrl, bookLabel) {
     const label = document.createElement('div');
     label.className = 'img-card-label';
     label.textContent = `${bookLabel} — Page ${pageNum}`;
+    const secLabel = document.getElementById('img-section-label');
+    if (secLabel) secLabel.textContent = '📖 Book Page';
     wrapper.appendChild(canvas);
     wrapper.appendChild(label);
     imgGrid.appendChild(wrapper);
@@ -1714,6 +1727,8 @@ async function fetchImagesForLesson(lessonText) {
 
     if (images.length > 0) {
       document.getElementById('img-section').style.display = 'block';
+      const lbl = document.getElementById('img-section-label');
+      if (lbl) lbl.textContent = '🖼️ Images';
       document.getElementById('img-grid').innerHTML = images.map(img => `
         <div class="img-card">
           <img src="${img.url}" alt="${img.label}" onerror="this.parentElement.style.display='none'" loading="lazy">
