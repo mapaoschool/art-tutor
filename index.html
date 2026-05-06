@@ -127,6 +127,9 @@ body{font-family:'Georgia',serif;background:var(--parch);color:var(--ink);min-he
 .img-grid-left{display:flex;flex-direction:column;gap:5px;}
 .img-card-left{border-radius:var(--radius-sm);overflow:hidden;border:1px solid var(--parch3);}
 .img-card-left img{width:100%;height:80px;object-fit:cover;display:block;}
+.img-card{border-radius:var(--radius-sm);overflow:hidden;border:1px solid var(--parch3);width:100%;max-width:100%;}
+.img-card img{width:100%;height:90px;object-fit:cover;display:block;}
+.img-card canvas{width:100%!important;height:auto!important;max-width:100%;display:block;}
 .img-card-label{font-size:9px;color:var(--ink3);padding:2px 5px;font-family:sans-serif;background:var(--parch2);}
 .img-loading{font-size:10px;color:var(--ink3);font-family:sans-serif;padding:4px 0;}
 
@@ -1483,11 +1486,14 @@ function startReadAloud(){
   const text = _pendingReadText || document.getElementById('ai-response').textContent;
   _pendingReadText = null;
   if(!text || text.includes('Tap "Begin') || text.includes('Tap \"Begin')) return;
-  // On Windows/Edge: ensure speechSynthesis is not stuck
-  if(window.speechSynthesis && window.speechSynthesis.pending){
-    window.speechSynthesis.cancel();
-  }
-  readAloud(text);
+  // Edge/Windows fix: always hard-cancel then wait 400ms before speaking.
+  // This clears any stuck synthesis state and ensures the user gesture is registered.
+  readingStopped = true;
+  window.speechSynthesis.cancel();
+  setTimeout(()=>{
+    readingStopped = false;
+    ensureVoices(()=>_doReadAloud(text));
+  }, 400);
 }
 function pauseReadAloud(){
   if(!window.speechSynthesis.speaking || window.speechSynthesis.paused) return;
