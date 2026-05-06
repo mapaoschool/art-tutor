@@ -244,6 +244,32 @@ body{font-family:'Georgia',serif;background:var(--parch);color:var(--ink);min-he
   .student-grid{grid-template-columns:1fr 1fr;}
   .subj-two-col{grid-template-columns:1fr;}
 }
+
+/* ── TEACHER DASHBOARD ── */
+#dashboard{background:var(--parch);padding:0;}
+.dash-topbar{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:2px solid var(--gold);background:var(--gold-light);}
+.dash-title{font-size:17px;font-weight:bold;color:var(--gold2);}
+.dash-sub{font-size:12px;color:var(--ink3);font-family:sans-serif;margin-top:2px;}
+.dash-scroll{flex:1;overflow-y:auto;padding:16px;}
+.dash-login{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px;}
+.dash-login input{padding:10px 16px;border:2px solid var(--parch3);border-radius:var(--radius-sm);font-size:15px;font-family:sans-serif;width:260px;text-align:center;}
+.dash-login input:focus{outline:none;border-color:var(--gold);}
+.dash-login button{padding:10px 28px;background:var(--gold);color:white;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:bold;cursor:pointer;font-family:sans-serif;}
+.dash-login .dash-err{color:var(--red);font-size:13px;font-family:sans-serif;}
+.dash-grid{display:flex;flex-direction:column;gap:20px;}
+.dash-student-block{background:var(--parch2);border-radius:var(--radius);border:1.5px solid var(--parch3);overflow:hidden;}
+.dash-student-hdr{padding:10px 16px;font-weight:bold;font-size:14px;font-family:sans-serif;border-bottom:1px solid var(--parch3);}
+.dash-table{width:100%;border-collapse:collapse;font-size:12px;font-family:sans-serif;}
+.dash-table th{padding:7px 10px;text-align:left;color:var(--ink3);font-weight:bold;border-bottom:1px solid var(--parch3);background:var(--parch);}
+.dash-table td{padding:7px 10px;border-bottom:1px solid var(--parch3);color:var(--ink);}
+.dash-table tr:last-child td{border-bottom:none;}
+.dash-table tr:hover td{background:var(--gold-light);}
+.dash-badge-done{display:inline-block;padding:2px 8px;border-radius:10px;background:#3d2262;color:#e8d8ff;font-size:10px;font-weight:bold;}
+.dash-badge-not{display:inline-block;padding:2px 8px;border-radius:10px;background:var(--parch3);color:var(--ink3);font-size:10px;}
+.dash-refresh{padding:6px 14px;background:var(--gold);color:white;border:none;border-radius:var(--radius-sm);font-size:12px;cursor:pointer;font-family:sans-serif;margin-left:auto;}
+.dash-sync-note{font-size:11px;color:var(--ink3);font-family:sans-serif;text-align:center;margin-top:12px;}
+.dash-loading{text-align:center;padding:40px;color:var(--ink3);font-family:sans-serif;}
+
 </style>
 </head>
 <body>
@@ -281,6 +307,7 @@ body{font-family:'Georgia',serif;background:var(--parch);color:var(--ink);min-he
       <div><span class="chip" style="background:#E4EEF8;color:#0C447C">Logic Gr. 3</span></div>
     </div>
   </div>
+  <button onclick="openDashboard()" style="margin-top:20px;padding:8px 22px;background:none;border:1.5px solid var(--gold);border-radius:20px;color:var(--gold2);font-size:12px;cursor:pointer;font-family:sans-serif;letter-spacing:0.03em;">📊 Teacher Dashboard</button>
 </div>
 
 <!-- ══════════════ SUBJECTS SCREEN ══════════════ -->
@@ -650,6 +677,36 @@ let highlightWords = [];
 let currentWordIndex = 0;
 
 // ══════════════════════════════════════════════
+// SUPABASE CONFIG
+// ══════════════════════════════════════════════
+const SUPA_URL = 'https://aomgllsmnbhbtqcssysx.supabase.co';
+const SUPA_KEY = 'sb_publishable_z7-G1oiLWdIskyTDbttM-w_29-gcJzz';
+
+async function syncToSupabase(student, subjectId, data, doneToday){
+  try {
+    const payload = {
+      student,
+      subject_id: subjectId,
+      session_count: data.sessionCount || 0,
+      last_lesson: data.lastLesson || 'Not started',
+      hints: data.hints || 0,
+      done_today: doneToday || false,
+      last_updated: new Date().toISOString()
+    };
+    await fetch(`${SUPA_URL}/rest/v1/progress`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPA_KEY,
+        'Authorization': `Bearer ${SUPA_KEY}`,
+        'Prefer': 'resolution=merge-duplicates'
+      },
+      body: JSON.stringify(payload)
+    });
+  } catch(e){ /* silent fail — localStorage always works */ }
+}
+
+// ══════════════════════════════════════════════
 // STORAGE
 // ══════════════════════════════════════════════
 function storageKey(student, subjectId){ return `mapao_${student}_${subjectId}`; }
@@ -659,6 +716,7 @@ function getSession(student, subjectId){
 }
 function saveSession(student, subjectId, data){
   try{ localStorage.setItem(storageKey(student,subjectId), JSON.stringify(data)); } catch(e){}
+  syncToSupabase(student, subjectId, data, isDone(student, subjectId));
 }
 
 // ══════════════════════════════════════════════
@@ -763,6 +821,8 @@ function toggleDone(event, studentId, subjectId){
   const key = getDoneKey(studentId, subjectId);
   const nowDone = !isDone(studentId, subjectId);
   try { localStorage.setItem(key, nowDone ? '1' : '0'); } catch(e){}
+  const sess = getSession(studentId, subjectId);
+  syncToSupabase(studentId, subjectId, sess, nowDone);
   renderSubjects(studentId);
 }
 
@@ -2048,5 +2108,33 @@ function toggleMic() {
   }
 }
 </script>
+
+<!-- ── TEACHER DASHBOARD SCREEN ── -->
+<div id="dashboard" class="screen">
+  <div class="dash-topbar">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <div>
+      <div class="dash-title">📊 Teacher Dashboard</div>
+      <div class="dash-sub">Ma Pao's Classical Catholic Homeschool</div>
+    </div>
+    <button class="dash-refresh" onclick="loadDashboard()" id="dash-refresh-btn">↻ Refresh</button>
+  </div>
+  <div class="dash-scroll">
+    <div id="dash-login-area" class="dash-login">
+      <div style="font-size:28px">🔐</div>
+      <div style="font-size:15px;font-weight:bold;color:var(--ink)">Teacher Access</div>
+      <input type="password" id="dash-pw-input" placeholder="Enter password" onkeydown="if(event.key==='Enter')checkDashPassword()"/>
+      <button onclick="checkDashPassword()">Enter</button>
+      <div class="dash-err" id="dash-err" style="display:none">Incorrect password</div>
+    </div>
+    <div id="dash-content" style="display:none">
+      <div id="dash-grid" class="dash-grid">
+        <div class="dash-loading">Loading progress from all devices...</div>
+      </div>
+      <div class="dash-sync-note">Data syncs automatically when students complete sessions. Last device activity shown.</div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
