@@ -808,6 +808,69 @@ function resetSubjColors(){
 function goHome(){ stopRead(); clearInterval(classTimerInterval); classTimerInterval=null; resetSubjColors(); showScreen('home'); }
 function goSubjects(){ stopRead(); resetSubjColors(); showScreen('subjects'); }
 
+// ── TEACHER DASHBOARD ──
+const DASH_PASSWORD = 'mapao2024';
+function openDashboard(){
+  // Reset login state each time
+  document.getElementById('dash-login-area').style.display = 'flex';
+  document.getElementById('dash-content').style.display = 'none';
+  document.getElementById('dash-err').style.display = 'none';
+  document.getElementById('dash-pw-input').value = '';
+  showScreen('dashboard');
+  setTimeout(()=>document.getElementById('dash-pw-input').focus(), 200);
+}
+function checkDashPassword(){
+  const pw = document.getElementById('dash-pw-input').value;
+  if(pw === DASH_PASSWORD){
+    document.getElementById('dash-login-area').style.display = 'none';
+    document.getElementById('dash-content').style.display = 'block';
+    loadDashboard();
+  } else {
+    document.getElementById('dash-err').style.display = 'block';
+    document.getElementById('dash-pw-input').value = '';
+    document.getElementById('dash-pw-input').focus();
+  }
+}
+function loadDashboard(){
+  const grid = document.getElementById('dash-grid');
+  grid.innerHTML = '';
+  const students = ['AL','FA','FC','LJ'];
+  const names = {AL:'A.L. — Grade 9–12', FA:'F.A. — Elementary', FC:'F.C. — Elementary', LJ:'L.J. — Kindergarten'};
+  const colors = {AL:'#27500A',FA:'#633806',FC:'#3C3489',LJ:'#0C447C'};
+  const bgs    = {AL:'#EAF3DE', FA:'#FAEEDA', FC:'#EEEDFE', LJ:'#E4EEF8'};
+  students.forEach(sid=>{
+    const subjList = SUBJECTS[sid] || [];
+    const block = document.createElement('div');
+    block.className = 'dash-student-block';
+    let rows = '';
+    subjList.forEach(subj=>{
+      const sess = getSession(sid, subj.id);
+      const doneToday = localStorage.getItem(getDoneKey(sid, subj.id)) === '1';
+      const badge = doneToday
+        ? '<span class="dash-badge-done">✔ Done</span>'
+        : '<span class="dash-badge-not">—</span>';
+      rows += `<tr>
+        <td>${subj.icon} ${subj.name}</td>
+        <td>${subj.tag}</td>
+        <td>${sess.lastLesson || '—'}</td>
+        <td>${sess.sessionCount || 0}</td>
+        <td>${badge}</td>
+      </tr>`;
+    });
+    block.innerHTML = `
+      <div class="dash-student-hdr" style="background:${bgs[sid]};color:${colors[sid]}">
+        ${names[sid]}
+      </div>
+      <table class="dash-table">
+        <thead><tr>
+          <th>Subject</th><th>Category</th><th>Last Lesson</th><th>Sessions</th><th>Today</th>
+        </tr></thead>
+        <tbody>${rows || '<tr><td colspan="5" style="color:var(--ink3);padding:14px;">No subjects configured</td></tr>'}</tbody>
+      </table>`;
+    grid.appendChild(block);
+  });
+}
+
 function getDoneKey(studentId, subjectId){
   const d = new Date();
   const dateStr = `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
