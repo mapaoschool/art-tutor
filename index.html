@@ -898,7 +898,10 @@ function showBookCover(){
   title.textContent = curSubject.book || curSubject.name;
 
   if(curSubject.bookUrl){
-    link.href = curSubject.bookUrl;
+    // Convert dl=0 to dl=1 for direct access, open in PDF.js viewer at page 1
+    const directUrl = curSubject.bookUrl.replace(/[?&]dl=0/, match => match.replace('dl=0','dl=1'));
+    const viewerUrl = `https://mozilla.github.io/pdf.js/web/viewer.html?file=${encodeURIComponent(directUrl)}#page=1`;
+    link.href = viewerUrl;
     link.style.display = 'block';
   } else {
     link.style.display = 'none';
@@ -1684,20 +1687,32 @@ async function loadPdfWithProxy(pdfUrl) {
   throw lastErr;
 }
 
+// Build a page-targeted viewer URL that works with Dropbox and external PDFs.
+// Uses Mozilla's hosted PDF.js viewer which supports #page=N and works cross-origin.
+function pdfPageUrl(rawUrl, pageNum) {
+  // Convert Dropbox dl=0 share links to direct-download links (dl=1)
+  const directUrl = rawUrl.replace(/[?&]dl=0/, match => match.replace('dl=0','dl=1'));
+  const viewerBase = 'https://mozilla.github.io/pdf.js/web/viewer.html';
+  return `${viewerBase}?file=${encodeURIComponent(directUrl)}#page=${pageNum}`;
+}
+
 async function renderBookPage(pageNum, pdfUrl, bookLabel) {
   const imgSection = document.getElementById('img-section');
   const imgGrid = document.getElementById('img-grid');
   const imgLoading = document.getElementById('img-loading');
 
+  // Show loading indicator but keep section hidden until we have real content
   imgSection.style.display = 'block';
   imgLoading.style.display = 'block';
   imgGrid.innerHTML = '';
 
   if (!pdfUrl) {
     imgLoading.style.display = 'none';
-    imgGrid.innerHTML = `<div style="font-size:11px;color:var(--ink2);padding:6px;">No book PDF linked for this subject.</div>`;
+    imgSection.style.display = 'none';
     return;
   }
+
+  const pageViewerUrl = pdfPageUrl(pdfUrl, pageNum);
 
   try {
     const doc = await loadPdfWithProxy(pdfUrl);
@@ -1714,8 +1729,9 @@ async function renderBookPage(pageNum, pdfUrl, bookLabel) {
     canvas.width = viewport.width;
     canvas.height = viewport.height;
     canvas.style.cssText = 'width:100%;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);cursor:pointer;';
-    canvas.title = 'Click to open full book';
-    canvas.onclick = () => window.open(pdfUrl, '_blank');
+    canvas.title = `Click to open page ${pageNum} in full reader`;
+    // Click opens the PDF.js viewer at the exact page — not just the book cover
+    canvas.onclick = () => window.open(pageViewerUrl, '_blank');
 
     await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
 
@@ -1725,7 +1741,8 @@ async function renderBookPage(pageNum, pdfUrl, bookLabel) {
     wrapper.style.cssText = 'text-align:center;';
     const label = document.createElement('div');
     label.className = 'img-card-label';
-    label.textContent = `${bookLabel} — Page ${pageNum}`;
+    label.style.cssText = 'font-size:10px;color:var(--ink3);margin-top:4px;';
+    label.innerHTML = `${bookLabel} — <a href="${pageViewerUrl}" target="_blank" style="color:var(--blue);">Page ${pageNum} ↗</a>`;
     const secLabel = document.getElementById('img-section-label');
     if (secLabel) secLabel.textContent = '📖 Book Page';
     wrapper.appendChild(canvas);
@@ -1735,11 +1752,14 @@ async function renderBookPage(pageNum, pdfUrl, bookLabel) {
 
   } catch(e) {
     imgLoading.style.display = 'none';
+    // Fallback: show a proper page-targeted link (not just the book cover)
     imgGrid.innerHTML = `
-      <div style="font-size:11px;color:var(--ink2);padding:6px;line-height:1.7;">
-        📖 <strong>${bookLabel}</strong> — Page ${pageNum}<br>
-        <a href="${pdfUrl}#page=${pageNum}" target="_blank" style="color:var(--blue);">Open page ${pageNum} ↗</a>
+      <div style="font-size:11px;color:var(--ink2);padding:6px;line-height:1.9;">
+        📖 <strong>${bookLabel}</strong><br>
+        <a href="${pageViewerUrl}" target="_blank" style="color:var(--blue);font-weight:bold;">Open page ${pageNum} ↗</a>
       </div>`;
+    const secLabel = document.getElementById('img-section-label');
+    if (secLabel) secLabel.textContent = '📖 Book Page';
     imgSection.style.display = 'block';
   }
 }
