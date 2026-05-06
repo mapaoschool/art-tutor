@@ -1307,11 +1307,12 @@ function readAloud(text){
   // Cancel any current speech
   readingStopped = true;
   window.speechSynthesis.cancel();
-  // Edge/Windows needs a small delay after cancel() before speaking again
+  // Windows/Chrome/Edge need a longer delay after cancel() before speaking again.
+  // 300 ms is more reliable than 150 ms on Windows.
   setTimeout(()=>{
     readingStopped = false;
     ensureVoices(()=>_doReadAloud(text));
-  }, 150);
+  }, 300);
 }
 
 function _doReadAloud(text){
@@ -1335,13 +1336,25 @@ function _doReadAloud(text){
   sessionBody.innerHTML = html;
   currentWordIndex = 0;
 
-  // Windows/Edge fix: speechSynthesis can pause silently mid-utterance
+  // Windows/Chrome/Edge fix: speechSynthesis can pause or get stuck mid-utterance.
+  // This interval resumes it if paused, and detects the stuck "speaking but silent" state.
+  let hackTick = 0;
   const resumeHack = setInterval(()=>{
     if(readingStopped){ clearInterval(resumeHack); return; }
     if(!window.speechSynthesis.speaking && !window.speechSynthesis.pending){
       clearInterval(resumeHack); return;
     }
-    if(window.speechSynthesis.paused) window.speechSynthesis.resume();
+    if(window.speechSynthesis.paused){
+      window.speechSynthesis.resume();
+    }
+    hackTick++;
+    // Safety: if synthesis appears stuck (speaking=true but no onstart/onend fired
+    // after 6 seconds), cancel and restart from current chunk
+    if(hackTick > 6 && isReading === false && window.speechSynthesis.speaking){
+      clearInterval(resumeHack);
+      window.speechSynthesis.cancel();
+      setTimeout(speakChunk, 200);
+    }
   }, 1000);
 
   const speed = parseFloat(document.getElementById('voice-speed').value);
@@ -1366,7 +1379,8 @@ function _doReadAloud(text){
   let pitch = profile.pitch;
   if(curStudent === 'LJ') pitch = Math.min(pitch + LJ_PITCH_BOOST, 1.2);
 
-  window.speechSynthesis.cancel();
+  // Do NOT cancel() again here — already cancelled with delay in readAloud().
+  // A second cancel() at this point kills queued speech on Windows/Chrome.
 
   const chunks = splitIntoChunks(text, 200);
   let chunkIndex = 0;
