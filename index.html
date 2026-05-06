@@ -457,17 +457,11 @@ body{font-family:'Georgia',serif;background:var(--parch);color:var(--ink);min-he
 
       <!-- Action buttons -->
       <div class="action-row">
-        <button class="btn btn-gold" id="btn-begin" onclick="beginSession()">✦ Begin</button>
         <button class="btn" id="btn-correct" onclick="markResponse('correct')" disabled>✓ Correct</button>
         <button class="btn" id="btn-partial" onclick="markResponse('partial')" disabled>Partial</button>
         <button class="btn" id="btn-wrong" onclick="markResponse('wrong')" disabled>Reteach</button>
         <button class="btn" id="btn-hint" onclick="giveHint()" disabled>Hint</button>
         <button class="btn" id="btn-next" onclick="nextQuestion()" disabled>Next →</button>
-      </div>
-
-      <!-- Second begin button at bottom -->
-      <div style="padding:8px 12px;border-top:1px solid var(--parch3);background:var(--parch2);">
-        <button class="begin-top-btn" onclick="beginSession()" style="width:100%;font-size:13px;padding:8px;">✦ Tap to Begin Today's Lesson</button>
       </div>
 
     </div><!-- end tutor-center -->
@@ -1018,7 +1012,6 @@ function openSubject(subjectId){
   ['btn-correct','btn-partial','btn-wrong','btn-hint','btn-next'].forEach(id=>{
     document.getElementById(id).disabled = true;
   });
-  document.getElementById('btn-begin').disabled = false;
   document.getElementById('btn-begin-top').disabled = false;
   document.getElementById('btn-begin-top').textContent = '✦ Tap to Begin Today\'s Lesson';
   showScreen('tutor');
@@ -1073,7 +1066,7 @@ function showBookCover(){
 // BEGIN SESSION — AI CALL
 // ══════════════════════════════════════════════
 async function beginSession(){
-  const btn = document.getElementById('btn-begin');
+  const btn = document.getElementById('btn-begin-top');
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span>Starting...';
   document.getElementById('btn-begin-top').disabled = true;
