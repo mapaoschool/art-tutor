@@ -103,7 +103,7 @@ body{font-family:'Lato',sans-serif;background:var(--vg-bg);color:var(--vg-text);
 .tutor-topbar .back-btn{color:var(--vg-text2);}
 .keep-subj-btn{padding:7px 13px;border-radius:var(--radius-sm);border:1px solid rgba(150,80,220,0.4);background:rgba(70,30,100,0.5);color:#B880E8;font-size:12px;font-weight:700;cursor:pointer;font-family:'Lato',sans-serif;white-space:nowrap;}
 .keep-subj-btn:hover{background:rgba(100,50,150,0.6);}
-.begin-top-btn{flex:1;padding:9px 16px;border-radius:var(--radius-sm);border:1px solid rgba(220,80,80,0.5);background:rgba(160,30,30,0.6);color:#FFB0B0;font-size:14px;font-weight:700;cursor:pointer;font-family:'Playfair Display',serif;transition:all 0.15s;}
+.begin-top-btn{flex:0 0 auto;padding:6px 11px;border-radius:var(--radius-sm);border:1px solid rgba(220,80,80,0.5);background:rgba(160,30,30,0.6);color:#FFB0B0;font-size:12px;font-weight:700;cursor:pointer;font-family:'Playfair Display',serif;transition:all 0.15s;margin-right:auto;}
 .begin-top-btn:hover{background:rgba(200,40,40,0.7);color:#FFD0D0;}
 .begin-top-btn:disabled{opacity:0.4;cursor:not-allowed;}
 
@@ -669,6 +669,7 @@ let timerSeconds = 5;
 let isReading = false;
 let readingStopped = false; // FIX: track explicit stop so chunks don't restart
 let lastQuestion = '';
+let sessionQuestionIndex = 0; // tracks how many questions answered this session for resume
 
 // Class timer state
 let classTimerInterval = null;
@@ -713,6 +714,17 @@ async function syncToSupabase(student, subjectId, data, doneToday){
 // STORAGE
 // ══════════════════════════════════════════════
 function storageKey(student, subjectId){ return `mapao_${student}_${subjectId}`; }
+// Lesson progress: stores { questionIndex, lastQuestion, timestamp } so session can resume
+function progressKey(student, subjectId){ return `mapao_progress_${student}_${subjectId}`; }
+function saveProgress(student, subjectId, questionIndex, lastQ){
+  try{ localStorage.setItem(progressKey(student,subjectId), JSON.stringify({questionIndex, lastQuestion:lastQ||'', timestamp:Date.now()})); } catch(e){}
+}
+function getProgress(student, subjectId){
+  try{ return JSON.parse(localStorage.getItem(progressKey(student,subjectId))); } catch(e){ return null; }
+}
+function clearProgress(student, subjectId){
+  try{ localStorage.removeItem(progressKey(student,subjectId)); } catch(e){}
+}
 function getSession(student, subjectId){
   try{ return JSON.parse(localStorage.getItem(storageKey(student,subjectId))) || {lastLesson:'Not started',sessionCount:0,hints:0}; }
   catch(e){ return {lastLesson:'Not started',sessionCount:0,hints:0}; }
@@ -768,6 +780,7 @@ async function endSessionByTimer(){
     sess.lastLesson = `Session ${sess.sessionCount} — ${curSubject.name}`;
     saveSession(curStudent, curSubject.id, sess);
     syncToSupabase(curStudent, curSubject.id, sess, true);
+    clearProgress(curStudent, curSubject.id); // Session complete — clear resume point
     const t = `Last: ${sess.lastLesson} · Sessions: ${sess.sessionCount}`;
     document.getElementById('tracker-text') && (document.getElementById('tracker-text').textContent = t);
     document.getElementById('tracker-text-right') && (document.getElementById('tracker-text-right').textContent = t);
@@ -1008,6 +1021,7 @@ function openSubject(subjectId){
   curSubject = list.find(s=>s.id===subjectId);
   if(!curSubject) return;
   sessionHints = 0;
+  sessionQuestionIndex = 0;
   lastQuestion = '';
   stopRead();
   clearInterval(classTimerInterval); classTimerInterval = null;
@@ -1133,6 +1147,18 @@ function showBookCover(){
 // ══════════════════════════════════════════════
 async function beginSession(){
   const btn = document.getElementById('btn-begin-top');
+
+  // Check for saved lesson progress and show inline resume notice
+  const savedProgress = getProgress(curStudent, curSubject.id);
+  if(savedProgress && savedProgress.questionIndex > 0){
+    const fbArea = document.getElementById('fb-area');
+    const resumeMsg = `Resuming from question ${savedProgress.questionIndex}. Continuing where you left off...`;
+    fbArea.innerHTML = `<div class="feedback" style="background:rgba(240,200,48,0.12);color:#412402;font-size:13px;">↩ ${resumeMsg}</div>`;
+    safeReadAloud(resumeMsg);
+  }
+
+  // Reset question index for this new session start
+  sessionQuestionIndex = 0;
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span>Starting...';
   document.getElementById('btn-begin-top').disabled = true;
@@ -1655,8 +1681,11 @@ function markResponse(type){
     const t = `Last: ${sess.lastLesson} · Sessions: ${sess.sessionCount}`;
     document.getElementById('tracker-text') && (document.getElementById('tracker-text').textContent = t);
     document.getElementById('tracker-text-right') && (document.getElementById('tracker-text-right').textContent = t);
+    safeReadAloud(msg.text);
   } else if(type==='partial'){
-    document.getElementById('fb-area').innerHTML = `<div class="feedback" style="background:rgba(240,200,48,0.12);color:#412402">Good try! Let's look at it from a different angle. Try again.</div>`;
+    const partialMsg = "Good try! Let's look at it from a different angle. Try again.";
+    document.getElementById('fb-area').innerHTML = `<div class="feedback" style="background:rgba(240,200,48,0.12);color:#412402">${partialMsg}</div>`;
+    safeReadAloud(partialMsg);
   } else if(type==='wrong'){
     reteachConcept();
   }
@@ -1769,6 +1798,8 @@ async function nextQuestion(){
     document.getElementById('ai-response').textContent=text;
     lastQuestion = extractLastQuestion(text);
     fetchImagesForLesson(text);
+    sessionQuestionIndex++;
+    saveProgress(curStudent, curSubject.id, sessionQuestionIndex, lastQuestion);
     readAloud(text);
   } catch(e){ document.getElementById('ai-response').textContent='Connection error. Please try again.'; }
   ['btn-send','btn-correct','btn-partial','btn-wrong','btn-hint','btn-next'].forEach(id=>{
@@ -1882,6 +1913,9 @@ Never say the student is jumping ahead. Stay within Catholic classical content. 
   ['btn-send','btn-correct','btn-partial','btn-wrong','btn-hint'].forEach(id=>{
     const el = document.getElementById(id); if(el) el.disabled = false;
   });
+  // Save lesson progress so session can resume if student exits
+  sessionQuestionIndex++;
+  saveProgress(curStudent, curSubject.id, sessionQuestionIndex, lastQuestion);
 }
 
 function clearTranscript() {
