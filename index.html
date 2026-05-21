@@ -1573,19 +1573,23 @@ function finishRead(){
 }
 
 function splitIntoChunks(text, maxWords){
+  // Split on sentence-ending punctuation; fall back to the whole text if none found.
+  // Also handles Bible History paragraphs that use colons/em-dashes without terminal
+  // punctuation — filters empty chunks that would silently kill TTS.
   const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
   const chunks = [];
   let current = '';
   for(const s of sentences){
     if((current + s).split(' ').length > maxWords){
-      if(current) chunks.push(current.trim());
+      if(current.trim()) chunks.push(current.trim());
       current = s;
     } else {
       current += ' ' + s;
     }
   }
   if(current.trim()) chunks.push(current.trim());
-  return chunks.length ? chunks : [text];
+  const valid = chunks.filter(c => c.trim().length > 0);
+  return valid.length ? valid : [text];
 }
 
 function toggleRead(){
@@ -1839,7 +1843,7 @@ async function nextQuestion(){
     fetchImagesForLesson(text);
     sessionQuestionIndex++;
     saveProgress(curStudent, curSubject.id, sessionQuestionIndex, lastQuestion);
-    readAloud(text);
+    safeReadAloud(text);
   } catch(e){ document.getElementById('ai-response').textContent='Connection error. Please try again.'; }
   ['btn-send','btn-correct','btn-partial','btn-wrong','btn-hint','btn-next'].forEach(id=>{
     const el = document.getElementById(id); if(el) el.disabled=false;
