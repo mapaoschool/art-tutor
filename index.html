@@ -1177,17 +1177,19 @@ function showBookCover(){
 async function beginSession(){
   const btn = document.getElementById('btn-begin-top');
 
-  // Check for saved lesson progress and show inline resume notice
+  // Check for saved lesson progress and restore question index
   const savedProgress = getProgress(curStudent, curSubject.id);
   if(savedProgress && savedProgress.questionIndex > 0){
+    sessionQuestionIndex = savedProgress.questionIndex;
+    lastQuestion = savedProgress.lastQuestion || '';
     const fbArea = document.getElementById('fb-area');
     const resumeMsg = `Resuming from question ${savedProgress.questionIndex}. Continuing where you left off...`;
     fbArea.innerHTML = `<div class="feedback" style="background:rgba(240,200,48,0.12);color:#412402;font-size:13px;">↩ ${resumeMsg}</div>`;
     safeReadAloud(resumeMsg);
+  } else {
+    // Fresh session — start from question 0
+    sessionQuestionIndex = 0;
   }
-
-  // Reset question index for this new session start
-  sessionQuestionIndex = 0;
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span>Starting...';
   document.getElementById('btn-begin-top').disabled = true;
@@ -1251,6 +1253,19 @@ Respond in plain, natural tutor voice — no markdown, no bullet symbols.`;
     }
     const text = data.content?.find(b=>b.type==='text')?.text || 'Could not load lesson. Please check your connection and try again.';
     document.getElementById('ai-response').textContent = text;
+    // Save lesson topic immediately so the next session knows what was covered.
+    // Extract the first meaningful sentence (after the greeting) as the lesson title.
+    const sentences = text.replace(/\n+/g,' ').match(/[^.!?]{15,}[.!?]/g) || [];
+    const lessonTitle = sentences.find(s => !/\b(hello|hi|good morning|good afternoon|welcome|great to see|nice to see|let's|let us begin|today we)\b/i.test(s))
+      || sentences[1] || sentences[0] || text.substring(0, 80);
+    const sess = getSession(curStudent, curSubject.id);
+    sess.lastLesson = lessonTitle.trim().substring(0, 120);
+    saveSession(curStudent, curSubject.id, sess);
+    const t = `Last: ${sess.lastLesson} · Sessions: ${sess.sessionCount}`;
+    document.getElementById('tracker-text') && (document.getElementById('tracker-text').textContent = t);
+    document.getElementById('tracker-text-right') && (document.getElementById('tracker-text-right').textContent = t);
+    // Also save question-level progress so student can resume mid-session
+    saveProgress(curStudent, curSubject.id, sessionQuestionIndex, lastQuestion);
     // Extract questions for right panel
     lastQuestion = extractLastQuestion(text);
     const questions = text.match(/[^.!?]*\?[^?]*/g) || [];
