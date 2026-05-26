@@ -708,6 +708,9 @@ let classTimerTotal = 15 * 60;
 let highlightWords = [];
 let currentWordIndex = 0;
 
+// TTS gesture unlock: set true on first mic use so bot replies auto-play
+let ttsGestureUnlocked = false;
+
 // ══════════════════════════════════════════════
 // SUPABASE CONFIG
 // ══════════════════════════════════════════════
@@ -1321,7 +1324,7 @@ function promptTapToListen(text){
 
 function safeReadAloud(text){
   if(!text) return;
-  if(NEEDS_GESTURE_FOR_TTS){
+  if(NEEDS_GESTURE_FOR_TTS && !ttsGestureUnlocked){
     promptTapToListen(text);
   } else {
     readAloud(text);
@@ -1443,7 +1446,7 @@ function pickVoice(profile){
 // ══════════════════════════════════════════════
 // READ ALOUD — FIXED with word highlighting & proper stop
 // ══════════════════════════════════════════════
-function readAloud(text){
+function readAloud(text, targetEl){
   if(!window.speechSynthesis) return;
   if(!text || text.includes('Tap "Begin')) return;
   // Cancel any current speech
@@ -1453,15 +1456,15 @@ function readAloud(text){
   // 400 ms matches startReadAloud() — keeps behavior consistent across all code paths.
   setTimeout(()=>{
     readingStopped = false;
-    ensureVoices(()=>_doReadAloud(text));
+    ensureVoices(()=>_doReadAloud(text, targetEl));
   }, 400);
 }
 
-function _doReadAloud(text){
+function _doReadAloud(text, targetEl){
   if(readingStopped) return;
 
-  // Prepare word highlight spans in the session body
-  const sessionBody = document.getElementById('ai-response');
+  // Prepare word highlight spans in the target element (default: #ai-response)
+  const sessionBody = targetEl || document.getElementById('ai-response');
   const words = text.split(/(\s+)/);
   highlightWords = [];
   let html = '';
@@ -2005,7 +2008,10 @@ Never say the student is jumping ahead. Stay within Catholic classical content. 
     if(newQs.length){
       document.getElementById('ai-question-box').innerHTML = newQs.map(q=>`<div style="background:rgba(240,200,48,0.12);border:1px solid #E8C870;border-radius:6px;padding:10px 12px;margin-bottom:8px;font-size:14px;color:var(--ink);line-height:1.6;">${q.trim()}</div>`).join('');
     }
-    safeReadAloud(reply);
+    // Read bot reply aloud, highlighting words inside the feedback div.
+    // Mic use already counts as a user gesture so we call readAloud directly.
+    const feedbackEl = fbArea.querySelector('.feedback');
+    readAloud(reply, feedbackEl);
     // Save lesson progress only on successful AI response
     sessionQuestionIndex++;
     saveProgress(curStudent, curSubject.id, sessionQuestionIndex, lastQuestion);
@@ -2478,6 +2484,7 @@ function toggleMic() {
     isListening = false;
     setMicState('idle');
   } else {
+    ttsGestureUnlocked = true; // mic tap is a user gesture — unlock TTS autoplay
     try {
       recognition.start();
     } catch(e) {
