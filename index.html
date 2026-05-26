@@ -418,7 +418,7 @@ body{font-family:'Lato',sans-serif;background:var(--vg-bg);color:var(--vg-text);
       <div class="read-bar" id="read-bar">
         🔊
         <div class="read-bar-btns">
-          <button class="rbtn" id="btn-read" onclick="startReadAloud()">▶ Read</button>
+          <button class="rbtn" id="btn-read" onclick="startReadAloud()" onpointerdown="ttsGestureUnlocked=true">▶ Read</button>
           <button class="rbtn" id="btn-pause-read" onclick="pauseReadAloud()" style="display:none">⏸ Pause</button>
           <button class="rbtn" id="btn-resume-read" onclick="resumeReadAloud()" style="display:none">▶ Resume</button>
           <button class="rbtn" id="btn-stop" onclick="stopRead()">■ Stop</button>
@@ -692,11 +692,17 @@ const HAS_SPEECH_RECOGNITION = !!(window.SpeechRecognition || window.webkitSpeec
 // NavigatorUAData API (available in Edge 90+) as a clean, forward-compatible check.
 // If neither is available we fall back to false (safe default — no edge-only hacks).
 const IS_EDGE_CHROMIUM = (()=>{
-  // Preferred: UA Client Hints (no string parsing, privacy-preserving)
+  // Preferred: UA Client Hints (no string parsing, privacy-preserving).
+  // Available on Edge desktop 90+.
   if(navigator.userAgentData && typeof navigator.userAgentData.brands === 'object'){
-    return navigator.userAgentData.brands.some(b =>
-      b.brand && b.brand.toLowerCase().includes('edge'));
+    if(navigator.userAgentData.brands.some(b =>
+      b.brand && b.brand.toLowerCase().includes('edge'))) return true;
   }
+  // Fallback for Edge mobile / older builds where userAgentData is absent or brands
+  // list omits "Edge". The UA string on Edge mobile reliably contains "EdgA" (Android)
+  // or "EdgiOS" (iOS) or "Edg/" (desktop fallback). This is a narrow targeted check —
+  // not general UA sniffing — used only to enable Edge-specific TTS workarounds.
+  if(/Edg\/|EdgA\/|EdgiOS\//i.test(navigator.userAgent)) return true;
   return false;
 })();
 
@@ -1561,12 +1567,17 @@ function _doReadAloud(text, targetEl){
     utt.onstart = ()=>{
       if(readingStopped){ window.speechSynthesis.cancel(); return; }
       isReading = true;
+      // Hide any "tap to enable audio" hint — audio is now playing.
+      const hint = document.getElementById('tts-blocked-hint');
+      if(hint) hint.style.display = 'none';
       console.log('[TTS Edge] onstart fired for chunk', chunkIndex); // Edge diagnostic
       document.getElementById('btn-read').style.display = 'none';
       document.getElementById('btn-pause-read').style.display = '';
       document.getElementById('btn-resume-read').style.display = 'none';
-      // Edge timed-highlight fallback: if onboundary hasn't fired within 2 s, advance
+      // Edge timed-highlight fallback: if onboundary hasn't fired within 600 ms, advance
       // words by estimated duration (~350 ms/word at rate=0.9, scaled by speed).
+      // 600 ms (down from 2 s) because Edge often never fires onboundary at all;
+      // waiting 2 s meant half the first sentence was spoken with no highlight.
       if(IS_EDGE_CHROMIUM){
         setTimeout(()=>{
           if(boundaryFired || readingStopped) return; // onboundary working — no need
@@ -1581,7 +1592,7 @@ function _doReadAloud(text, targetEl){
               currentWordIndex++;
             }
           }, msPerWord);
-        }, 2000);
+        }, 600);
       }
     };
     // Edge sometimes fires onstart late or not at all — apply button state
@@ -1636,24 +1647,35 @@ function _doReadAloud(text, targetEl){
     // ── Edge silent-fail watchdog ──────────────────────────────────────────
     // Edge (Chromium) sometimes silently drops speak() — onstart never fires,
     // speechSynthesis.speaking stays false, and no onerror is raised.
-    // Detected via capability check (navigator.userAgentData brands), not UA string.
-    // Fix: 800 ms after speak(), if synthesis still hasn't started, cancel + retry once.
+    // Detected via capability check (navigator.userAgentData brands + UA fallback).
+    // Fix: poll at 800 ms and 1500 ms; if synthesis still hasn't started, cancel + retry.
+    // Two probes cover both Edge desktop (usually recovers by 800 ms) and Edge mobile
+    // (can take up to ~1200 ms to start speaking after speak() is called).
     if(IS_EDGE_CHROMIUM){
       const watchdogChunk = chunkIndex; // capture the chunk we just tried
-      setTimeout(()=>{
-        if(readingStopped) return;
-        // If synthesis is already running or this chunk moved on, nothing to do.
-        if(isReading) return;
-        if(chunkIndex !== watchdogChunk) return; // chunk advanced — onend already fired
-        if(window.speechSynthesis.speaking) return; // speaking fine
-        if(window.speechSynthesis.pending) return; // Edge fix: queued, not silent-failed
-        // Silent fail confirmed — cancel and retry this chunk once.
-        console.log('[TTS Edge] silent-fail watchdog fired — retrying chunk', chunkIndex);
-        window.speechSynthesis.cancel();
+      let watchdogRetries = 0;
+      const runWatchdog = (delay)=>{
         setTimeout(()=>{
-          if(!readingStopped) speakChunk();
-        }, 200);
-      }, 800);
+          if(readingStopped) return;
+          if(isReading) return;
+          if(chunkIndex !== watchdogChunk) return; // chunk advanced — onend already fired
+          if(window.speechSynthesis.speaking) return; // speaking fine
+          if(window.speechSynthesis.pending) return; // Edge: queued, not silent-failed
+          if(watchdogRetries >= 2){
+            // Both probes failed — audio is likely autoplay-blocked; prompt user to tap again.
+            showTtsBlockedHint();
+            return;
+          }
+          watchdogRetries++;
+          console.log('[TTS Edge] silent-fail watchdog fired (attempt', watchdogRetries, ') — retrying chunk', chunkIndex);
+          window.speechSynthesis.cancel();
+          setTimeout(()=>{
+            if(!readingStopped) speakChunk();
+          }, 200);
+        }, delay);
+      };
+      runWatchdog(800);
+      runWatchdog(1500);
     }
     // ──────────────────────────────────────────────────────────────────────
   }
@@ -1670,6 +1692,19 @@ function finishRead(){
   if(btnRead){ btnRead.style.display = ''; btnRead.classList.remove('playing'); }
   if(btnPause) btnPause.style.display = 'none';
   if(btnResume) btnResume.style.display = 'none';
+}
+
+// Edge autoplay-blocked hint — shown only when TTS silently fails after all retries.
+// Dismissed automatically after 5 s or on next successful TTS start.
+function showTtsBlockedHint(){
+  let hint = document.getElementById('tts-blocked-hint');
+  if(hint){ hint.style.display = ''; return; } // already present
+  hint = document.createElement('div');
+  hint.id = 'tts-blocked-hint';
+  hint.style.cssText = 'position:fixed;bottom:70px;left:50%;transform:translateX(-50%);background:rgba(240,200,48,0.15);border:1px solid rgba(240,200,48,0.5);color:#F0C830;font-size:12px;font-family:Lato,sans-serif;padding:8px 16px;border-radius:20px;z-index:9999;text-align:center;pointer-events:none;';
+  hint.textContent = '🔊 Tap ▶ Read again to enable audio';
+  document.body.appendChild(hint);
+  setTimeout(()=>{ if(hint) hint.style.display = 'none'; }, 5000);
 }
 
 function splitIntoChunks(text, maxWords){
@@ -1716,11 +1751,26 @@ function startReadAloud(){
   // Strip spinner/placeholder text before attempting TTS
   const text = rawText.replace(/\s*Generating.*?\.{0,3}\s*/gi,'').trim();
   if(!text || text.includes('Tap "Begin') || text.includes('Tap \"Begin') || text.length < 3) return;
+
+  // Edge fix: unlock AudioContext in the same gesture to satisfy autoplay policy.
+  // This is a no-op on browsers that don't need it, and is safe to call every time.
+  if(typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined'){
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      const ctx = new AC();
+      ctx.resume().catch(()=>{});
+      // We only need the resume — close it after a short delay to avoid resource leak.
+      setTimeout(()=>{ try{ ctx.close(); }catch(e){} }, 2000);
+    } catch(e){}
+  }
+
   readingStopped = true;
   window.speechSynthesis.cancel();
   // Always speak immediately on first tap (hasPending) to stay within the
   // browser gesture context. On re-reads (no pending text), use a short delay
   // to clear any stuck synthesis state on Windows/Chrome/Edge.
+  // Edge fix: use 120 ms even for hasPending — Edge needs slightly more time than
+  // Chrome for cancel() to settle, but 120 ms is safely within the ~1 s gesture window.
   const doSpeak = ()=>{
     readingStopped = false;
     // Eagerly show Pause button so it's available even if onstart fires late (F.C. fix)
@@ -1729,9 +1779,7 @@ function startReadAloud(){
     if(pauseBtn) pauseBtn.style.display = '';
     ensureVoices(()=>_doReadAloud(text));
   };
-  // Edge fix: always wait for cancel() to settle before speaking, even on first tap.
-  // 50 ms is safely within browser gesture lifetime (~1 s) but long enough for Edge.
-  setTimeout(doSpeak, hasPending ? 50 : 400);
+  setTimeout(doSpeak, hasPending ? 120 : 400);
 }
 function pauseReadAloud(){
   // Accept paused OR speaking (covers browsers where paused flag lags)
