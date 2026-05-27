@@ -685,26 +685,36 @@ const IS_MOBILE = IS_IOS || /Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test
 const NEEDS_GESTURE_FOR_TTS = true;
 const HAS_SPEECH_RECOGNITION = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
 
-// Edge capability detection — NO user-agent sniffing.
-// CSS.supports('(-webkit-appearance:none)') is true in all Chromium-based browsers,
-// but we detect Edge specifically via its CSS paint worklet behaviour: Edge/Chromium
-// exposes CSS.paintWorklet while other Chromium forks may not. We also use the
-// NavigatorUAData API (available in Edge 90+) as a clean, forward-compatible check.
-// If neither is available we fall back to false (safe default — no edge-only hacks).
+// Linux detection — used to enable TTS workarounds for Linux Chromium/Chrome.
+const IS_LINUX = (()=>{
+  if(navigator.userAgentData && navigator.userAgentData.platform)
+    return navigator.userAgentData.platform.toLowerCase().includes('linux');
+  return /Linux/i.test(navigator.userAgent) && !/Android/i.test(navigator.userAgent);
+})();
+
+// Chromium detection (Chrome, Chromium, Edge, Brave — anything Chromium-based).
+const IS_CHROMIUM = (()=>{
+  if(navigator.userAgentData && typeof navigator.userAgentData.brands === 'object'){
+    return navigator.userAgentData.brands.some(b =>
+      b.brand && /chromium|chrome/i.test(b.brand));
+  }
+  return /Chrome\/|Chromium\//i.test(navigator.userAgent);
+})();
+
+// Edge capability detection.
 const IS_EDGE_CHROMIUM = (()=>{
-  // Preferred: UA Client Hints (no string parsing, privacy-preserving).
-  // Available on Edge desktop 90+.
   if(navigator.userAgentData && typeof navigator.userAgentData.brands === 'object'){
     if(navigator.userAgentData.brands.some(b =>
       b.brand && b.brand.toLowerCase().includes('edge'))) return true;
   }
-  // Fallback for Edge mobile / older builds where userAgentData is absent or brands
-  // list omits "Edge". The UA string on Edge mobile reliably contains "EdgA" (Android)
-  // or "EdgiOS" (iOS) or "Edg/" (desktop fallback). This is a narrow targeted check —
-  // not general UA sniffing — used only to enable Edge-specific TTS workarounds.
   if(/Edg\/|EdgA\/|EdgiOS\//i.test(navigator.userAgent)) return true;
   return false;
 })();
+
+// Browsers needing timed-highlight fallback + silent-fail watchdog:
+// Edge (all platforms) + any Chromium browser on Linux.
+// Firefox on Linux fires onboundary correctly — no workaround needed.
+const NEEDS_TTS_WATCHDOG = IS_EDGE_CHROMIUM || (IS_LINUX && IS_CHROMIUM);
 
 // ══════════════════════════════════════════════
 // STATE
@@ -1614,7 +1624,7 @@ function _doReadAloud(text, targetEl, startChunk){
       // words by estimated duration (~350 ms/word at rate=0.9, scaled by speed).
       // 600 ms (down from 2 s) because Edge often never fires onboundary at all;
       // waiting 2 s meant half the first sentence was spoken with no highlight.
-      if(IS_EDGE_CHROMIUM){
+      if(NEEDS_TTS_WATCHDOG){
         setTimeout(()=>{
           if(boundaryFired || readingStopped) return; // onboundary working — no need
           const msPerWord = Math.round(350 / (speed || 0.9));
@@ -1687,7 +1697,7 @@ function _doReadAloud(text, targetEl, startChunk){
     // Fix: poll at 800 ms and 1500 ms; if synthesis still hasn't started, cancel + retry.
     // Two probes cover both Edge desktop (usually recovers by 800 ms) and Edge mobile
     // (can take up to ~1200 ms to start speaking after speak() is called).
-    if(IS_EDGE_CHROMIUM){
+    if(NEEDS_TTS_WATCHDOG){
       const watchdogChunk = chunkIndex; // capture the chunk we just tried
       let watchdogRetries = 0;
       let watchdogFired = false; // prevent double-fire when both probes hit simultaneously
