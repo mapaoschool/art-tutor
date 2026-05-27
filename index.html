@@ -437,6 +437,11 @@ body{font-family:'Lato',sans-serif;background:var(--vg-bg);color:var(--vg-text);
       <div class="session-scroll">
         <div class="session-body" id="ai-response">Tap "Begin Today's Lesson" to start.</div>
         <div class="session-cite" id="ai-cite"></div>
+        <!-- Lesson images — shown below text, large and prominent -->
+        <div id="lesson-images" style="display:none;margin-top:14px;padding-bottom:10px;">
+          <div id="lesson-images-loading" style="display:none;font-size:12px;color:var(--vg-text3);padding:6px 0;font-family:'Lato',sans-serif;"><span class="spinner"></span> Loading images...</div>
+          <div id="lesson-images-grid" style="display:flex;flex-direction:column;gap:10px;"></div>
+        </div>
       </div>
 
       <!-- Student text input -->
@@ -1526,7 +1531,7 @@ function _doReadAloud(text, targetEl, startChunk){
 
   // Prepare word highlight spans — skip rebuild if resuming (startChunk set, spans already exist)
   const sessionBody = targetEl || document.getElementById('ai-response');
-  if(!startChunk){
+  if(startChunk == null){
     const words = text.split(/(\s+)/);
     highlightWords = [];
     let html = '';
@@ -1595,7 +1600,7 @@ function _doReadAloud(text, targetEl, startChunk){
   // A second cancel() at this point kills queued speech on Windows/Chrome.
 
   const chunks = splitIntoChunks(text, 200);
-  let chunkIndex = (startChunk && startChunk > 0) ? startChunk : 0;
+  let chunkIndex = (startChunk != null && startChunk > 0) ? startChunk : 0;
 
   function speakChunk(){
     pausedChunkIndex = chunkIndex;   // keep module-scope in sync for pause
@@ -2348,12 +2353,38 @@ async function renderBookPage(pageNum, pdfUrl, bookLabel) {
 // WEB IMAGE SEARCH
 // ══════════════════════════════════════════════
 async function fetchImagesForLesson(lessonText) {
+  // Reset both sidebar and center image panels
   document.getElementById('img-section').style.display = 'none';
   document.getElementById('img-grid').innerHTML = '';
+  document.getElementById('lesson-images').style.display = 'none';
+  document.getElementById('lesson-images-grid').innerHTML = '';
 
   const isArt = curSubject && curSubject.id.includes('art');
   const isCursive = curSubject && curSubject.id.includes('cursive');
   if (isCursive) return;
+
+  // Helper: display images prominently in the center reading panel
+  function showCenterImages(images, sectionLabel) {
+    if (!images || images.length === 0) return;
+    const panel = document.getElementById('lesson-images');
+    const grid = document.getElementById('lesson-images-grid');
+    const lbl = document.getElementById('img-section-label');
+    if (lbl) lbl.textContent = sectionLabel || '🖼️ Images';
+    grid.innerHTML = images.map(img => `
+      <div style="border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);">
+        <img src="${img.url}" alt="${img.label}"
+          style="width:100%;max-height:280px;object-fit:contain;display:block;background:#111;"
+          onerror="this.closest('div').style.display='none'" loading="lazy">
+        <div style="font-size:11px;color:var(--vg-text3);padding:4px 8px;font-family:'Lato',sans-serif;text-transform:capitalize;">${img.label}</div>
+      </div>
+    `).join('');
+    panel.style.display = 'block';
+    // Also populate the sidebar thumbnail
+    document.getElementById('img-section').style.display = 'block';
+    document.getElementById('img-grid').innerHTML = images.slice(0,1).map(img => `
+      <div class="img-card-left"><img src="${img.url}" alt="${img.label}" onerror="this.parentElement.style.display='none'" loading="lazy"></div>
+    `).join('');
+  }
 
   // UNIVERSAL: any subject can show a book page with [SHOW_PAGE: N]
   const pageMatch = lessonText.match(/\[SHOW_PAGE:\s*(\d+)\]/i);
@@ -2368,110 +2399,94 @@ async function fetchImagesForLesson(lessonText) {
     const tagMatch = lessonText.match(/\[SHOW_IMAGE:\s*([^\]]+)\]/i);
     if (!tagMatch) return;
     const objectDescription = tagMatch[1].trim();
-    document.getElementById('img-section').style.display = 'block';
-    document.getElementById('img-loading').style.display = 'block';
+    document.getElementById('lesson-images-loading').style.display = 'block';
+    document.getElementById('lesson-images').style.display = 'block';
     const images = await searchImages([objectDescription + ' historical', objectDescription]);
-    document.getElementById('img-loading').style.display = 'none';
-    if (images.length > 0) {
-      document.getElementById('img-grid').innerHTML = images.map(img => `
-        <div class="img-card">
-          <img src="${img.url}" alt="${img.label}" onerror="this.parentElement.style.display='none'" loading="lazy">
-          <div class="img-card-label">${img.label}</div>
-        </div>
-      `).join('');
-    } else {
-      document.getElementById('img-section').style.display = 'none';
-    }
+    document.getElementById('lesson-images-loading').style.display = 'none';
+    showCenterImages(images, '🎨 Reference Image');
     return;
   }
 
-  // Science: check for [IMAGE: ...] tags in lesson
+  // Science: check for [IMAGE: ...] tags first
   const isScience = curSubject && curSubject.id.includes('science');
-  if(isScience){
+  if (isScience) {
     const tagMatches = [...lessonText.matchAll(/\[IMAGE:\s*([^\]]+)\]/gi)];
-    if(tagMatches.length > 0){
+    if (tagMatches.length > 0) {
       const queries = tagMatches.slice(0,2).map(m=>m[1].trim());
-      document.getElementById('img-section').style.display = 'block';
-      document.getElementById('img-loading').style.display = 'block';
+      document.getElementById('lesson-images-loading').style.display = 'block';
+      document.getElementById('lesson-images').style.display = 'block';
       const images = await searchImages(queries);
-      document.getElementById('img-loading').style.display = 'none';
-      if(images.length > 0){
-        document.getElementById('img-grid').innerHTML = images.map(img => `
-          <div class="img-card">
-            <img src="${img.url}" alt="${img.label}" onerror="this.parentElement.style.display='none'" loading="lazy">
-            <div class="img-card-label">${img.label}</div>
-          </div>
-        `).join('');
-      } else {
-        document.getElementById('img-section').style.display = 'none';
-      }
+      document.getElementById('lesson-images-loading').style.display = 'none';
+      showCenterImages(images, '🔬 Science Images');
       return;
     }
-    // If no tag, try to auto-find an image
+    // Fall through to auto-keyword extraction below
   }
 
+  // ALL subjects: auto-extract image keywords from lesson text via AI
   const isArithmetic = curSubject && curSubject.id.includes('arithmetic');
+  const isMath = curSubject && curSubject.id.includes('math');
+  // Skip pure math/grammar — no meaningful visuals
+  if (isMath && !isArithmetic) return;
 
   try {
     const subjectHint = isArithmetic
-      ? 'This is an arithmetic lesson from Ray\'s Primary Arithmetic (1877). Look for visual aids like counting objects, number illustrations, or concrete math objects described in the lesson.'
+      ? "This is an arithmetic lesson (Ray's Primary Arithmetic). Find a visual of the main object or concept being counted or described."
       : isScience
-      ? `This is a Natural Sciences lesson about insects, plants, animals, or habitats. Find an image of the main organism or habitat described.`
-      : `Subject: ${curSubject.name}. Find images that illustrate the main visual concept.`;
+      ? "This is a Natural Sciences lesson. Find an image of the main living creature, plant, insect, or habitat described."
+      : `This is a ${curSubject.name} lesson for a classical Catholic homeschool student. Find images that make the lesson content visual and memorable.`;
+
+    // Show loading spinner in center panel right away
+    document.getElementById('lesson-images').style.display = 'block';
+    document.getElementById('lesson-images-loading').style.display = 'block';
 
     const kwRes = await fetch('https://divine-sunset-f2ee.panicovillegas.workers.dev', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-5',
-        max_tokens:100,
-        messages:[{role:'user',content:`${subjectHint} Lesson text: "${lessonText.substring(0,400)}". Extract 2 short image search queries (3-5 words each) that would show a student the key visual concept. Reply with ONLY a JSON array of 2 strings, no other text. Example: ["counting balls numbers 1-10","number line primary school"]`}]
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-5',
+        max_tokens: 100,
+        messages: [{role: 'user', content: `${subjectHint}\n\nLesson text: "${lessonText.substring(0,500)}"\n\nExtract 2 short Wikipedia-friendly image search queries (3-5 words each) that would show a student the main visual subject of this lesson. Focus on concrete nouns — animals, objects, people, places. Reply with ONLY a JSON array of 2 strings, no other text. Example: ["garden spider web","spider anatomy diagram"]`}]
       })
     });
     const kwData = await kwRes.json();
     const kwText = kwData.content?.find(b=>b.type==='text')?.text || '[]';
     let keywords = [];
-    try { keywords = JSON.parse(kwText.replace(/```json|```/g,'').trim()); } catch(e) { return; }
-    if (!keywords || !keywords.length) return;
+    try { keywords = JSON.parse(kwText.replace(/```json|```/g,'').trim()); } catch(e) {}
+    document.getElementById('lesson-images-loading').style.display = 'none';
 
-    document.getElementById('img-section').style.display = 'block';
-    document.getElementById('img-loading').style.display = 'block';
+    if (!keywords || !keywords.length) {
+      document.getElementById('lesson-images').style.display = 'none';
+      return;
+    }
 
     const images = await searchImages(keywords.slice(0,2));
-    document.getElementById('img-loading').style.display = 'none';
-
     if (images.length > 0) {
-      document.getElementById('img-section').style.display = 'block';
-      const lbl = document.getElementById('img-section-label');
-      if (lbl) lbl.textContent = '🖼️ Images';
-      document.getElementById('img-grid').innerHTML = images.map(img => `
-        <div class="img-card">
-          <img src="${img.url}" alt="${img.label}" onerror="this.parentElement.style.display='none'" loading="lazy">
-          <div class="img-card-label">${img.label}</div>
-        </div>
-      `).join('');
+      showCenterImages(images, '🖼️ Lesson Images');
     } else {
-      document.getElementById('img-section').style.display = 'none';
+      document.getElementById('lesson-images').style.display = 'none';
     }
   } catch(e) {
+    document.getElementById('lesson-images').style.display = 'none';
     document.getElementById('img-section').style.display = 'none';
   }
 }
 
 async function searchImages(keywords) {
   const images = [];
+  // Strategy 1: Wikipedia article search with pageimages (most reliable)
   for (const kw of keywords) {
+    if (images.length >= 2) break;
     try {
       const encoded = encodeURIComponent(kw);
-      const url = `https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${encoded}&gsrnamespace=6&prop=imageinfo&iiprop=url|mime&format=json&origin=*&gsrlimit=2`;
+      const url = `https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${encoded}&gsrnamespace=0&gsrlimit=3&prop=pageimages&pithumbsize=400&piprop=thumbnail&format=json&origin=*`;
       const r = await fetch(url);
       const d = await r.json();
       const pages = d.query?.pages;
       if (pages) {
         for (const page of Object.values(pages)) {
-          const imgUrl = page?.imageinfo?.[0]?.url;
-          const mime = page?.imageinfo?.[0]?.mime;
-          if (imgUrl && mime && mime.startsWith('image/') && !mime.includes('svg') && !imgUrl.includes('Icon')) {
+          const imgUrl = page?.thumbnail?.source;
+          if (imgUrl && !imgUrl.includes('Icon') && !imgUrl.includes('placeholder')) {
             images.push({url: imgUrl, label: kw});
             break;
           }
@@ -2479,6 +2494,7 @@ async function searchImages(keywords) {
       }
     } catch(e) {}
   }
+  // Strategy 2: Wikimedia Commons file search (fallback)
   if (images.length === 0) {
     for (const kw of keywords) {
       try {
