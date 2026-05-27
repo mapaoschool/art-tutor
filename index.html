@@ -1492,23 +1492,25 @@ function _doReadAloud(text, targetEl, startChunk){
   pausedFullText = text;   // save for pause/resume restart
   isPaused = false;
 
-  // Prepare word highlight spans in the target element (default: #ai-response)
+  // Prepare word highlight spans — skip rebuild if resuming (startChunk set, spans already exist)
   const sessionBody = targetEl || document.getElementById('ai-response');
-  const words = text.split(/(\s+)/);
-  highlightWords = [];
-  let html = '';
-  let wordIdx = 0;
-  for(const part of words){
-    if(/\S/.test(part)){
-      html += `<span class="hl-word" id="hw${wordIdx}">${part.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</span>`;
-      highlightWords.push(wordIdx);
-      wordIdx++;
-    } else {
-      html += part.replace(/\n/g,'<br>');
+  if(!startChunk){
+    const words = text.split(/(\s+)/);
+    highlightWords = [];
+    let html = '';
+    let wordIdx = 0;
+    for(const part of words){
+      if(/\S/.test(part)){
+        html += `<span class="hl-word" id="hw${wordIdx}">${part.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</span>`;
+        highlightWords.push(wordIdx);
+        wordIdx++;
+      } else {
+        html += part.replace(/\n/g,'<br>');
+      }
     }
+    sessionBody.innerHTML = html;
+    currentWordIndex = 0;
   }
-  sessionBody.innerHTML = html;
-  currentWordIndex = 0;
 
   // Windows/Chrome/Edge fix: speechSynthesis can pause or get stuck mid-utterance.
   // This interval resumes it if paused, and detects the stuck "speaking but silent" state.
@@ -1802,8 +1804,8 @@ function startReadAloud(){
   }
 }
 function pauseReadAloud(){
-  if(!window.speechSynthesis.speaking && !window.speechSynthesis.paused && !isReading) return;
   if(isPaused) return; // already paused
+  if(!isReading && !window.speechSynthesis.speaking && !window.speechSynthesis.pending) return; // nothing playing
   // Try native pause first; if unsupported (Edge + offline voices), fall back to cancel + save position
   isPaused = true;
   isReading = false;
