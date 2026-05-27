@@ -1356,16 +1356,16 @@ function safeReadAloud(text){
 // VOICE SYSTEM
 // ══════════════════════════════════════════════
 const VOICE_PROFILES = {
-  aesop:    { lang:'en-US', prefer:['Samantha','Karen','Moira','Fiona','Victoria','Serena','Aria','Jenny','Zira'], pitch:1.0, label:'Storyteller' },
-  narnia:   { lang:'en-US', prefer:['Samantha','Karen','Moira','Fiona','Victoria','Serena','Aria','Jenny','Zira'], pitch:1.0, label:'Storyteller' },
-  bible:    { lang:'en-US', prefer:['Samantha','Karen','Moira','Victoria','Serena','Aria','Jenny'],               pitch:0.95,label:'Warm narrator' },
-  history:  { lang:'en-US', prefer:['Samantha','Karen','Moira','Victoria','Serena','Aria','Jenny'],               pitch:0.95,label:'Warm narrator' },
-  science:  { lang:'en-US', prefer:['Samantha','Karen','Moira','Victoria','Serena','Aria','Jenny'],               pitch:0.95,label:'Warm narrator' },
+  aesop:    { lang:'en-US', prefer:['Zira','Linda','David','Samantha','Karen','Moira','Fiona','Victoria','Serena','Aria','Jenny'], pitch:1.0, label:'Storyteller' },
+  narnia:   { lang:'en-US', prefer:['Zira','Linda','David','Samantha','Karen','Moira','Fiona','Victoria','Serena','Aria','Jenny'], pitch:1.0, label:'Storyteller' },
+  bible:    { lang:'en-US', prefer:['Zira','Linda','David','Samantha','Karen','Moira','Victoria','Serena','Aria','Jenny'],               pitch:0.95,label:'Warm narrator' },
+  history:  { lang:'en-US', prefer:['Zira','Linda','David','Samantha','Karen','Moira','Victoria','Serena','Aria','Jenny'],               pitch:0.95,label:'Warm narrator' },
+  science:  { lang:'en-US', prefer:['Zira','Linda','David','Samantha','Karen','Moira','Victoria','Serena','Aria','Jenny'],               pitch:0.95,label:'Warm narrator' },
   latin:    { lang:'en-US', prefer:['Daniel','Tom','Oliver','Arthur','Aaron','Rishi','Alex','Fred','Thomas'],     pitch:1.0, label:'Warm male' },
-  math:       { lang:'en-US', prefer:['Samantha','Karen','Aria','Jenny','Zira','Alice'],                         pitch:1.0, label:'Clear instructor' },
-  arithmetic: { lang:'en-US', prefer:['Samantha','Karen','Aria','Jenny','Zira','Alice'],                         pitch:1.0, label:'Clear instructor' },
-  grammar:    { lang:'en-US', prefer:['Samantha','Karen','Aria','Jenny','Zira','Alice'],                         pitch:1.0, label:'Clear instructor' },
-  art:        { lang:'en-US', prefer:['Samantha','Karen','Moira','Fiona','Aria','Jenny'],                        pitch:1.0, label:'Warm instructor' },
+  math:       { lang:'en-US', prefer:['Zira','Linda','David','Samantha','Karen','Aria','Jenny','Alice'],                         pitch:1.0, label:'Clear instructor' },
+  arithmetic: { lang:'en-US', prefer:['Zira','Linda','David','Samantha','Karen','Aria','Jenny','Alice'],                         pitch:1.0, label:'Clear instructor' },
+  grammar:    { lang:'en-US', prefer:['Zira','Linda','David','Samantha','Karen','Aria','Jenny','Alice'],                         pitch:1.0, label:'Clear instructor' },
+  art:        { lang:'en-US', prefer:['Zira','Linda','David','Samantha','Karen','Moira','Fiona','Aria','Jenny'],                        pitch:1.0, label:'Warm instructor' },
   spanish:  { lang:'es-MX', prefer:['Paulina','Monica','Esperanza','Mónica','Angelica','Marisol','Jorge'],       pitch:1.0, label:'Spanish' },
 };
 const LJ_PITCH_BOOST = 0.05;
@@ -1642,9 +1642,7 @@ function _doReadAloud(text, targetEl){
     };
 
     speechUtterance = utt;
-    console.log('[TTS] calling speak() — chunk', chunkIndex, '— voice:', chosenVoice ? chosenVoice.name : 'default', '— pending before:', window.speechSynthesis.pending, '— speaking before:', window.speechSynthesis.speaking);
     window.speechSynthesis.speak(utt);
-    console.log('[TTS] after speak() — pending:', window.speechSynthesis.pending, '— speaking:', window.speechSynthesis.speaking);
 
     // ── Edge silent-fail watchdog ──────────────────────────────────────────
     // Edge (Chromium) sometimes silently drops speak() — onstart never fires,
@@ -1747,7 +1745,6 @@ function toggleRead(){
   }
 }
 function startReadAloud(){
-  console.log('[TTS] startReadAloud() called — ttsGestureUnlocked:', ttsGestureUnlocked, 'IS_EDGE_CHROMIUM:', IS_EDGE_CHROMIUM);
   ttsGestureUnlocked = true; // Edge fix: Read button is a valid user gesture — unlock auto-play
   // Reset any "Tap to Listen" styling on btn-read
   const readBtn = document.getElementById('btn-read');
